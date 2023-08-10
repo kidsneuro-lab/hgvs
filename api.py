@@ -25,6 +25,10 @@ with open('pyhgvs/data/genes.refGene') as infile:
 def get_transcript(name):
     return transcripts.get(name)
 
+@app.get("/", response_model=str)
+def alive():
+    return "HGVS Translator"
+
 @app.get("/alive", response_model=str)
 def alive():
     return "alive"
