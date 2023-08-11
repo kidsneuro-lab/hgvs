@@ -11,19 +11,7 @@ WITH_VENV=. $(VENV_ACTIVATE);
 default:
 	python setup.py check build
 
-.PHONY: setup clean teardown venv lint test gitlint
-
-setup: venv
-
-venv: $(VENV_ACTIVATE)
-
-$(VENV_DIR)/bin/activate: requirements-dev.txt
-	test -d $(VENV_DIR) || virtualenv --python=python2.7 --system-site-packages $(VENV_DIR)
-	$(WITH_VENV) pip install -r requirements-dev.txt
-	touch $(VENV_DIR)/bin/activate
-
-teardown:
-	rm -rf $(VENV_DIR)/
+.PHONY: setup clean lint test gitlint
 
 clean:
 	python setup.py clean
@@ -35,11 +23,11 @@ clean:
 	rm -f $(TEST_OUTPUT)
 	find $(PACKAGE_NAME) -type f -name '*.pyc' -delete
 
-lint: venv
-	$(WITH_VENV) flake8 --jobs=auto $(PACKAGE_NAME)/ $(SCRIPTS)
+lint:
+	flake8 --jobs=auto $(PACKAGE_NAME)/ $(SCRIPTS)
 
-test: venv
-	$(WITH_VENV) nosetests --verbosity=2 --with-xunit --xunit-file=$(TEST_OUTPUT)
+test:
+	nosetests --verbosity=2 --with-xunit --xunit-file=$(TEST_OUTPUT)
 
 package:
 	python setup.py sdist

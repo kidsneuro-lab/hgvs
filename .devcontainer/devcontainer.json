@@ -8,9 +8,7 @@
 		"ghcr.io/jungaretti/features/make:1": {}
 	},
 	"containerEnv": {
-		"PIP_DISABLE_PIP_VERSION_CHECK": "1",
-		"FASTA": "assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa",
-		"REFGENE": "pyhgvs/data/genes.refGene"
+		"PIP_DISABLE_PIP_VERSION_CHECK": "1"
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
@@ -20,7 +18,7 @@
 	"forwardPorts": [8000],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip3 install --user -r requirements.txt"
+	"postCreateCommand": "pip3 install --user -r requirements.txt; pip3 install --user -r requirements-dev.txt; "
 
 	// Configure tool-specific properties.
 	// "customizations": {},

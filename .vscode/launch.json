@@ -9,8 +9,28 @@
             "type": "python",
             "request": "launch",
             "module": "uvicorn",
+            "env": {
+                "FASTA": "assemblies/hg38.fa",
+                "REFGENE": "pyhgvs/data/genes.refGene"
+            },
             "args": [
-                "api:app",
+                "pyhgvs.api:app",
+                "--reload"
+            ],
+            "jinja": true,
+            "justMyCode": true
+        },
+        {
+            "name": "Python: FastAPI - chrX",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "env": {
+                "FASTA": "pyhgvs/tests/data/chrX.fa",
+                "REFGENE": "pyhgvs/tests/data/genes.refGene"
+            },
+            "args": [
+                "pyhgvs.api:app",
                 "--reload"
             ],
             "jinja": true,
