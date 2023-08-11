@@ -1,5 +1,8 @@
 from __future__ import print_function
 from __future__ import unicode_literals
+
+import os
+
 from fastapi import FastAPI
 from typing import Tuple,List
 from pyfaidx import Fasta
@@ -13,12 +16,21 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 # Read genome sequence using pyfaidx.
-file='./data/hg19.fa'
+file=os.getenv('FASTA')
 logger.info('Loading file {file}')
+
+if not os.path.exists(file):
+    raise Exception(f"Fasta file: {file} not found. Please check if file exists or FASTA environment variable has been defined")
+
 genome = Fasta(file)
 
 # Read RefSeq transcripts into a python dict.
-with open('pyhgvs/data/genes.refGene') as infile:
+
+refgene=os.getenv('REFGENE')
+if not os.path.exists(refgene):
+    raise Exception(f"Refgene file: {refgene} not found. Please check if file exists or REFGENE environment variable has been defined")
+
+with open(refgene) as infile:
     transcripts = hgvs_utils.read_transcripts(infile)
 
 # Provide a callback for fetching a transcript by its name.
