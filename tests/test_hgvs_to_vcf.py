@@ -12,6 +12,7 @@ sys.path.append(target_folder_path)
 
 import pyhgvs as hgvs
 import pyhgvs.utils as hgvs_utils
+from pyhgvs.models.hgvs_name import InvalidHGVSName
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +56,18 @@ class TestHgvsToVCF:
             transcripts = hgvs_utils.read_transcripts(infile)
         yield lambda name: transcripts.get(name)
 
-    @pytest.mark.parametrize('hgvs_vcf_data', read_fixture_data("tests/fixtures/hgvs_vcf.tsv"), ids=TestID.idfn1)
-    def test_hgvs(self, hgvs_vcf_data, genome: Fasta, transcripts):
-        chr, pos, ref, alt = hgvs.parse_hgvs_name(hgvs_name=hgvs_vcf_data['hgvs_c'], genome=genome, get_transcript=transcripts)
+    @pytest.mark.parametrize('hgvs_vcf_data', read_fixture_data("tests/fixtures/hgvs_vcf_valid.tsv"), ids=TestID.idfn1)
+    def test_valid_hgvs(self, hgvs_vcf_data, genome: Fasta, transcripts):
+        chr, pos, ref, alt = hgvs.parse_hgvs_name(hgvs_name=hgvs_vcf_data['hgvs_c'], genome=genome, get_transcript=transcripts, lazy=True)
 
-        assert 1 == 1
+        scenario_1 = (chr == hgvs_vcf_data['chr']) and (pos == int(hgvs_vcf_data['pos'])) and (ref == hgvs_vcf_data['ref']) and (alt == hgvs_vcf_data['alt'])
+        
+        # The test data may not be left justified. This is to check for those scenarios
+        scenario_2 = (chr == hgvs_vcf_data['chr']) and (pos == int(hgvs_vcf_data['pos']) - 1) and (ref[1:] == hgvs_vcf_data['ref']) and (alt[1:] == hgvs_vcf_data['alt'])
+
+        assert scenario_1 or scenario_2
+
+    @pytest.mark.parametrize('hgvs_vcf_data', read_fixture_data("tests/fixtures/hgvs_vcf_invalid.tsv"), ids=TestID.idfn1)
+    def test_invalid_hgvs(self, hgvs_vcf_data, genome: Fasta, transcripts):
+        with pytest.raises(InvalidHGVSName):
+            hgvs.parse_hgvs_name(hgvs_name=hgvs_vcf_data['hgvs_c'], genome=genome, get_transcript=transcripts, lazy=True)
