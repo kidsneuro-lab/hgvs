@@ -10,7 +10,7 @@ import pyhgvs as hgvs
 import pyhgvs.utils as hgvs_utils
 import logging
 
-logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
+logging.config.fileConfig('pyhgvs/logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
 
 app = FastAPI()
@@ -19,7 +19,7 @@ app = FastAPI()
 file=os.getenv('FASTA')
 logger.info('Loading file {file}')
 
-if not os.path.exists(file):
+if file is None or not os.path.exists(file):
     raise Exception(f"Fasta file: {file} not found. Please check if file exists or FASTA environment variable has been defined")
 
 genome = Fasta(file)
@@ -27,7 +27,7 @@ genome = Fasta(file)
 # Read RefSeq transcripts into a python dict.
 
 refgene=os.getenv('REFGENE')
-if not os.path.exists(refgene):
+if refgene is None or not os.path.exists(refgene):
     raise Exception(f"Refgene file: {refgene} not found. Please check if file exists or REFGENE environment variable has been defined")
 
 with open(refgene) as infile:
