@@ -45,10 +45,6 @@ nosetests.xml
 .idea
 
 # Assemblies and reference files
-assemblies
-reference
-**/genes.refGene
-**/LRG_RefSeqGene
 tests/fixtures/chrX.fa
 
 # Testing framework
