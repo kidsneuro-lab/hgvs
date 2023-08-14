@@ -49,3 +49,5 @@ reference
 **/genes.refGene
 **/LRG_RefSeqGene
 tests/fixtures/chrX.fa
+
+**/.DS_Store
