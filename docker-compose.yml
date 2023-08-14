@@ -5,10 +5,7 @@ services:
     image: hgvs
     build: .
     ports:
-      - "8001:8000"  # Replace with appropriate port mapping
-    volumes:
-      - ./assemblies:/assemblies
-      - ./reference:/reference
+      - "8000:8000"  # Replace with appropriate port mapping
     environment:
-      - FASTA=/assemblies/hg38.fa
-      - REFGENE=/reference/genes.refGene
+      - FASTA=/app/assemblies/hg38.fa
+      - REFGENE=/app/reference/genes.refGene
