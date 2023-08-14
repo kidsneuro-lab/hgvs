@@ -19,4 +19,4 @@ jobs:
       run: ./download_refGene.sh -hg38_sample
 
     - name: Build Tests
-      run: run-tests.sh
+      run: ./run-tests.sh
