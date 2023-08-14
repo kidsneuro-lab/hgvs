@@ -9,8 +9,12 @@ on:
 jobs:
 
   build:
-
     runs-on: ubuntu-latest
+    
+    environment:
+      name: dev
+      url: https://dev-geneie.frontiergenomics.com.au/
+
 
     steps:
     - uses: actions/checkout@v3
