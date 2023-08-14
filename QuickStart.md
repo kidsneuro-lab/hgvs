@@ -1,6 +1,9 @@
 ```sh
+./download_refGene.sh -hg38
 docker build . -t hgvs
 docker run -p 8000:8000 hgvs
+or
+docker compose up
 ```
 
 - single translation
