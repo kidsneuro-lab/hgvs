@@ -172,3 +172,11 @@ a different genome sequence back-end, see
 
 The docker image is known as 'peterknealecmri/hgvs' and is available here [https://hub.docker.com/r/peterknealecmri/hgvs](https://hub.docker.com/r/peterknealecmri/hgvs)
 
+- Pull latest master build
+```
+docker pull peterknealecmri/hgvs:master
+```
+- Pull a build of a specific github SHA
+```
+docker pull peterknealecmri/hgvs:sha-b7d3ad5
+```
