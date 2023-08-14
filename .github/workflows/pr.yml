@@ -22,4 +22,4 @@ jobs:
       run: docker compose -f docker-compose-tests.yml build
 
     - name: Run Tests
-      run: docker compose -f docker-compose-tests.yml run
+      run: docker compose -f docker-compose-tests.yml up
