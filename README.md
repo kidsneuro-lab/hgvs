@@ -167,3 +167,8 @@ The library does assume that genome sequence is available through a `pyfaidx`
 compatible `Fasta` object. For an example of writing a wrapper for
 a different genome sequence back-end, see
 [hgvs.tests.genome.MockGenome](pyhgvs/tests/genome.py).
+
+# Docker Image
+
+The docker image is known as 'peterknealecmri/hgvs' and is available here [https://hub.docker.com/r/peterknealecmri/hgvs](https://hub.docker.com/r/peterknealecmri/hgvs)
+

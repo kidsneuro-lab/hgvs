@@ -25,11 +25,17 @@ jobs:
         username: ${{ vars.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
         
-    - name: Extract Docker metadata
+    - name: Docker meta
       id: meta
       uses: docker/metadata-action@v4
       with:
         images: peterknealecmri/hgvs
+        tags: |
+          type=ref,event=branch
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{major}}.{{minor}}
+          type=sha
 
     - name: Build and push
       uses: docker/build-push-action@v4
