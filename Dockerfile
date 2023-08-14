@@ -19,6 +19,7 @@ COPY . /app
 #################################################################################
 FROM builder as tests
 RUN python -m pip install --no-cache-dir --disable-pip-version-check -r requirements-dev.txt
+CMD pytest
 
 #################################################################################
 # STAGE - RUNTIME

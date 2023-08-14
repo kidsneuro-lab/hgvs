@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  hgvs_tests:
+    image: hgvs_tests
+    build: 
+      context: .
+      target: tests
+    environment:
+      - FASTA=assemblies/hg38.fa
+      - REFGENE=reference/genes.refGene
