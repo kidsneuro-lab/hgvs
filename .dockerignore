@@ -43,9 +43,3 @@ nosetests.xml
 .project
 .pydevproject
 .idea
-
-# Assemblies and reference files
-tests/fixtures/chrX.fa
-
-# Testing framework
-tests
