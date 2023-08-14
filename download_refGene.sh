@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 # Check if a command line argument is provided
 if [ $# -ne 1 ]; then
