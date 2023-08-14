@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  hgvs_tests:
-    image: hgvs_tests
+  tests:
+    image: tests
     build: 
       context: .
       target: tests
