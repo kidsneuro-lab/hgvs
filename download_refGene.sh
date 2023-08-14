@@ -14,7 +14,7 @@ case "$parameter" in
     "-hg38")
         echo "Downloading Refseq (ncbiRefSeq)"
         mkdir -p reference
-        docker run -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -it --rm mysql mysql -ugenome -hgenome-euro-mysql.soe.ucsc.edu --compression-algorithms zlib -AD hg38 -BNe "SELECT r.bin,
+        docker run -e MYSQL_ALLOW_EMPTY_PASSWORD=1 --rm mysql mysql -ugenome -hgenome-euro-mysql.soe.ucsc.edu --compression-algorithms zlib -AD hg38 -BNe "SELECT r.bin,
             r.name,
             r.chrom,
             r.strand,
@@ -35,7 +35,7 @@ case "$parameter" in
         ;" > reference/genes.refGene
         
         echo "Downloading Refseq (refGene)"
-        docker run -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -it --rm mysql mysql -ugenome -hgenome-euro-mysql.soe.ucsc.edu --compression-algorithms zlib -AD hg38 -BNe "WITH ncbi_names AS
+        docker run -e MYSQL_ALLOW_EMPTY_PASSWORD=1 --rm mysql mysql -ugenome -hgenome-euro-mysql.soe.ucsc.edu --compression-algorithms zlib -AD hg38 -BNe "WITH ncbi_names AS
         (
             SELECT DISTINCT REGEXP_REPLACE(name, '\.[0-9]+$', '') AS name 
             FROM hg38.ncbiRefSeq
@@ -79,12 +79,12 @@ case "$parameter" in
             mkdir -p assemblies
             wget -nv -c -O assemblies/hg38.fa.gz https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/latest/hg38.fa.gz
             gunzip assemblies/hg38.fa.gz
-            docker run -it --rm -v ./assemblies:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/hg38.fa
+            docker run --rm -v ./assemblies:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/hg38.fa
         fi
         ;;
     "-hg38_sample")
         echo "Downloading Refseq (ncbiRefSeq and refGene)"
-        docker run -e MYSQL_ALLOW_EMPTY_PASSWORD=1 -it --rm mysql mysql -ugenome -hgenome-mysql.cse.ucsc.edu --compression-algorithms zlib -AD hg38 -BNe "WITH ncbi AS
+        docker run -e MYSQL_ALLOW_EMPTY_PASSWORD=1 --rm mysql mysql -ugenome -hgenome-mysql.cse.ucsc.edu --compression-algorithms zlib -AD hg38 -BNe "WITH ncbi AS
         (
             SELECT r.bin,
                 r.name,
@@ -143,7 +143,7 @@ case "$parameter" in
         if [ ! -f tests/fixtures/chrX.fa.fai ]; then
             wget -nv -c -O tests/fixtures/chrX.fa.gz https://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/chrX.fa.gz
             gunzip tests/fixtures/chrX.fa.gz
-            docker run -it --rm -v ./tests/fixtures:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/chrX.fa
+            docker run --rm -v ./tests/fixtures:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/chrX.fa
         fi
         ;;
     *)
