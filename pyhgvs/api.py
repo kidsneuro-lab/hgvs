@@ -18,17 +18,20 @@ app = FastAPI()
 # Read genome sequence using pyfaidx.
 file=os.getenv('FASTA')
 logger.info('Loading file {file}')
-
-if file is None or not os.path.exists(file):
-    raise Exception(f"Fasta file: {file} not found. Please check if file exists or FASTA environment variable has been defined")
+if file is None:
+    raise Exception(f"FASTA env var not set.")
+if not os.path.exists(file):
+    raise Exception(f"FASTA file: {file} not found. Please check if file exists")
 
 genome = Fasta(file)
 
 # Read RefSeq transcripts into a python dict.
 
 refgene=os.getenv('REFGENE')
-if refgene is None or not os.path.exists(refgene):
-    raise Exception(f"Refgene file: {refgene} not found. Please check if file exists or REFGENE environment variable has been defined")
+if refgene is None:
+    raise Exception(f"REFGENE env var not set.")
+if not os.path.exists(refgene):
+    raise Exception(f"REFGENE file: {refgene} not found. Please check if file exists")
 
 with open(refgene) as infile:
     transcripts = hgvs_utils.read_transcripts(infile)
