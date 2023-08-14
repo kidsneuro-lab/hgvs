@@ -42,8 +42,8 @@ def process_entries(input_file: str, output_file: str, genome_file: str, transcr
                 outfile.write(f"{hgvs_name}\t\t\t\t\tInvalid HGVS notation\n")
             except Exception as e:
                 error_msg = traceback.format_exc()
-                logging.error(f"Encountered error while processing '{hgvs_name}: {error_msg}")
-                outfile.write(f"{hgvs_name}\t\t\t\t\t{error_msg}\n")
+                logging.error(f"Encountered error while processing '{hgvs_name}: {str(e)}")
+                outfile.write(f"{hgvs_name}\t\t\t\t\t{str(e)}\n")
 
 def main():
     parser = argparse.ArgumentParser(description="Process HGVS entries and generate VCF standard output")
