@@ -8,7 +8,9 @@
 		"ghcr.io/jungaretti/features/make:1": {}
 	},
 	"containerEnv": {
-		"PIP_DISABLE_PIP_VERSION_CHECK": "1"
+		"PIP_DISABLE_PIP_VERSION_CHECK": "1",
+		"FASTA":"assemblies/hg38.fa",
+		"REFGENE":"reference/genes.refGene"
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
