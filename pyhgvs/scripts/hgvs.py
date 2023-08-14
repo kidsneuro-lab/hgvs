@@ -26,7 +26,8 @@ def process_entries(input_file: str, output_file: str, genome_file: str, transcr
 
     logging.debug(f"Opening input file: {input_file}, output file: {output_file}")
     with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:    
-        outfile.write(f"#lazy={lazy},normalize={normalize}")
+        outfile.write(f"#lazy={lazy}\n")
+        outfile.write(f"#normalize={normalize}\n")
         outfile.write("ID\tchr\tpos\tref\talt\terror\n")
  
         for line in infile:
