@@ -1,20 +1,10 @@
-#! /usr/bin/make
-
 PACKAGE_NAME=pyhgvs
-SCRIPTS=bin/hgvs
-TEST_OUTPUT?=nosetests.xml
 
-VENV_DIR?=.venv
-VENV_ACTIVATE=$(VENV_DIR)/bin/activate
-WITH_VENV=. $(VENV_ACTIVATE);
+default: package
 
-default:
-	python setup.py check build
-
-.PHONY: setup clean lint test gitlint
+.PHONY: clean lint test
 
 clean:
-	python setup.py clean
 	rm -rf build/
 	rm -rf dist/
 	rm -rf *.egg*/
@@ -26,8 +16,5 @@ clean:
 lint:
 	flake8 --jobs=auto $(PACKAGE_NAME)/ $(SCRIPTS)
 
-test:
-	nosetests --verbosity=2 --with-xunit --xunit-file=$(TEST_OUTPUT)
-
 package:
-	python setup.py sdist
+	python3 -m build
