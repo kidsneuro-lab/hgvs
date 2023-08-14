@@ -31,4 +31,4 @@ COPY --from=builder /app /app
 RUN python -m pip install --no-cache-dir --disable-pip-version-check -r requirements.txt
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
-CMD uvicorn pyhgvs.api:app --host 0.0.0.0 --port 8000
+CMD uvicorn pyhgvs.api:app --host 0.0.0.0 --port 8000 --timeout-graceful-shutdown 10
