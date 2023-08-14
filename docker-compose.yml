@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  hgvs:  # Replace with your desired service name
+  hgvs:
     image: hgvs
     build: .
     ports:
-      - "8000:8000"  # Replace with appropriate port mapping
+      - "8000:8000"
     environment:
-      - FASTA=/app/assemblies/hg38.fa
-      - REFGENE=/app/reference/genes.refGene
+      - FASTA=assemblies/hg38.fa
+      - REFGENE=reference/genes.refGene
