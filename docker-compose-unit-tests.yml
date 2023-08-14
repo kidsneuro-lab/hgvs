@@ -7,5 +7,5 @@ services:
       context: .
       target: tests
     environment:
-      - FASTA=assemblies/hg38.fa
-      - REFGENE=reference/genes.refGene
+      - FASTA=tests/fixtures/chrX.fa
+      - REFGENE=tests/fixtures/genes.refGene
