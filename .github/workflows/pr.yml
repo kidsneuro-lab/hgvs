@@ -19,7 +19,4 @@ jobs:
       run: ./download_refGene.sh -hg38_sample
 
     - name: Build Tests
-      run: docker compose -f docker-compose-tests.yml build
-
-    - name: Run Tests
-      run: docker compose -f docker-compose-tests.yml run
+      run: ./run-tests.sh
