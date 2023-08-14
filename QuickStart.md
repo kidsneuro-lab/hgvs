@@ -4,6 +4,13 @@ docker build . -t hgvs
 docker run -p 8000:8000 hgvs
 or
 docker compose up
+
+docker pull peterknealecmri/hgvs:sha-b255c65
+docker run \
+    -p "8000:8000" \
+    -e FASTA=assemblies/hg38.fa \
+    -e REFGENE=reference/genes.refGene \
+    peterknealecmri/hgvs:sha-b255c65
 ```
 
 - single translation
