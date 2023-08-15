@@ -48,6 +48,6 @@ assemblies
 reference
 **/genes.refGene
 **/LRG_RefSeqGene
-tests/fixtures/chrX.fa
+tests/fixtures/*.fa**
 
 **/.DS_Store

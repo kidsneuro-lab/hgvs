@@ -10,8 +10,8 @@
             "request": "launch",
             "module": "uvicorn",
             "env": {
-                "FASTA": "assemblies/hg38.fa",
-                "REFGENE": "pyhgvs/data/genes.refGene"
+                "FASTA": "assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa",
+                "REFGENE": "reference/genes.refGene"
             },
             "args": [
                 "pyhgvs.api:app",
@@ -26,8 +26,8 @@
             "request": "launch",
             "module": "uvicorn",
             "env": {
-                "FASTA": "pyhgvs/tests/data/chrX.fa",
-                "REFGENE": "pyhgvs/tests/data/genes.refGene"
+                "FASTA": "tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa",
+                "REFGENE": "tests/fixtures/genes.refGene"
             },
             "args": [
                 "pyhgvs.api:app",
