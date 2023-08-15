@@ -17,7 +17,7 @@ case "$parameter" in
         mkdir -p reference
         docker run -e MYSQL_ALLOW_EMPTY_PASSWORD=1 --rm mysql mysql -ugenome -hgenome-euro-mysql.soe.ucsc.edu --compression-algorithms zlib -AD hg38 -BNe "SELECT r.bin,
             r.name,
-            r.chrom,
+            REPLACE(r.chrom, 'chr', '') AS chrom,
             r.strand,
             r.txStart,
             r.txEnd,
@@ -49,7 +49,7 @@ case "$parameter" in
         )
         SELECT r.bin,
             CONCAT(r.name, '.', g.version) AS name,
-            r.chrom,
+            REPLACE(r.chrom, 'chr', '') AS chrom,
             r.strand,
             r.txStart,
             r.txEnd,
@@ -76,11 +76,11 @@ case "$parameter" in
         fi
 
         echo Downloading and indexing hg38
-        if [ ! -f assemblies/hg38.fa.fai ]; then
+        if [ ! -f assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa.fai ]; then
             mkdir -p assemblies
-            wget -nv -c -O assemblies/hg38.fa.gz https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/latest/hg38.fa.gz
-            gunzip assemblies/hg38.fa.gz
-            docker run --rm -v ./assemblies:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/hg38.fa
+            wget -nv -c -O assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+            gunzip assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
+            docker run --rm -v ./assemblies:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa
         fi
         ;;
     "-hg38_sample")
@@ -89,7 +89,7 @@ case "$parameter" in
         (
             SELECT r.bin,
                 r.name,
-                r.chrom,
+                REPLACE(r.chrom, 'chr', '') AS chrom,
                 r.strand,
                 r.txStart,
                 r.txEnd,
@@ -108,7 +108,7 @@ case "$parameter" in
         ), refGene AS (
             SELECT r.bin,
                 CONCAT(r.name, '.', g.version) AS name,
-                r.chrom,
+                REPLACE(r.chrom, 'chr', '') AS chrom,
                 r.strand,
                 r.txStart,
                 r.txEnd,
@@ -141,10 +141,10 @@ case "$parameter" in
         fi
 
         echo Downloading and indexing hg38 \(chrX\)
-        if [ ! -f tests/fixtures/chrX.fa.fai ]; then
-            wget -nv -c -O tests/fixtures/chrX.fa.gz https://hgdownload.soe.ucsc.edu/goldenPath/hg38/chromosomes/chrX.fa.gz
-            gunzip tests/fixtures/chrX.fa.gz
-            docker run --rm -v ./tests/fixtures:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/chrX.fa
+        if [ ! -f tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa.fai ]; then
+            wget -nv -c -O tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz
+            gunzip tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz
+            docker run --rm -v ./tests/fixtures:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/Homo_sapiens.GRCh38.dna.chromosome.X.fa
         fi
         ;;
     *)
