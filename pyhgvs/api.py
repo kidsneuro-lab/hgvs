@@ -17,7 +17,7 @@ app = FastAPI()
 
 # Read genome sequence using pyfaidx.
 file=os.getenv('FASTA')
-logger.info('Loading file {file}')
+logger.info('FASTA:%s', file)
 if file is None:
     raise Exception(f"FASTA env var not set.")
 if not os.path.exists(file):
@@ -28,6 +28,7 @@ genome = Fasta(file)
 # Read RefSeq transcripts into a python dict.
 
 refgene=os.getenv('REFGENE')
+logger.info('REFGENE:%s', refgene)
 if refgene is None:
     raise Exception(f"REFGENE env var not set.")
 if not os.path.exists(refgene):
