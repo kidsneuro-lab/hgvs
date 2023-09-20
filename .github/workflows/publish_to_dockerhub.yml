@@ -1,12 +1,14 @@
-name: Deploy
+name: publish_to_dockerhub
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ "master" ]
+    branches:
+      - master
 
 jobs:
 
-  build:
+  publish_to_dockerhub:
     runs-on: ubuntu-latest
 
     environment:
@@ -28,7 +30,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@v4
       with:
-        images: peterknealecmri/hgvs
+        images:  ${{ vars.DOCKERHUB_USERNAME }}/hgvs
         tags: |
           type=ref,event=branch
           type=ref,event=pr
