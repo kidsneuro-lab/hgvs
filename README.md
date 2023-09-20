@@ -170,13 +170,13 @@ a different genome sequence back-end, see
 
 # Docker Image
 
-The docker image is known as 'peterknealecmri/hgvs' and is available here [https://hub.docker.com/r/peterknealecmri/hgvs](https://hub.docker.com/r/peterknealecmri/hgvs)
+The docker image is known as 'kidsneurolab/hgvs' and is available here [https://hub.docker.com/r/kidsneurolab/hgvs](https://hub.docker.com/r/kidsneurolab/hgvs)
 
 - Pull latest master build
 ```
-docker pull peterknealecmri/hgvs:master
+docker pull kidsneurolab/hgvs:master
 ```
 - Pull a build of a specific github SHA
 ```
-docker pull peterknealecmri/hgvs:sha-b7d3ad5
+docker pull kidsneurolab/hgvs:sha-b7d3ad5
 ```
