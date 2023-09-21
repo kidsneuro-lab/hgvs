@@ -27,4 +27,4 @@ ENV PYTHONUNBUFFERED=1
 WORKDIR /app
 COPY --from=build /app /app
 COPY --from=build /usr/local /usr/local
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8002"]
+CMD ["uvicorn", "pyhgvs.api:app", "--host", "0.0.0.0", "--port", "8002"]
