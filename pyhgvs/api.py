@@ -43,13 +43,17 @@ with open(refgene) as infile:
 def get_transcript(name):
     return transcripts.get(name)
 
-@app.get("/", response_model=str)
-def alive():
-    return "HGVS Translator"
+@app.get("/")
+def get_root():
+    return {"App": "HGVS Translator"}
 
-@app.get("/alive", response_model=str)
-def alive():
-    return "alive"
+@app.get("/health/alive")
+def get_alive():
+    return {"status": "alive"}
+
+@app.get("/health/ready")
+def get_ready():
+    return {"status": "ready"}
 
 @app.get("/translate", response_model=Tuple[str, int, str, str])
 def translate_hgvs(value: str):
