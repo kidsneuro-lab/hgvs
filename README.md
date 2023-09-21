@@ -170,13 +170,13 @@ a different genome sequence back-end, see
 
 # Docker Image
 
-The docker image is known as 'kidsneurolab/hgvs' and is available here [https://hub.docker.com/r/kidsneurolab/hgvs](https://hub.docker.com/r/kidsneurolab/hgvs)
+The docker image is known as 'schnknc/hgvs' and is available here [https://hub.docker.com/r/schnknc/hgvs](https://hub.docker.com/r/schnknc/hgvs)
 
 - Pull latest master build
 ```
-docker pull kidsneurolab/hgvs:master
+docker pull schnknc/hgvs:master
 ```
 - Pull a build of a specific github SHA
 ```
-docker pull kidsneurolab/hgvs:sha-b7d3ad5
+docker pull schnknc/hgvs:sha-b7d3ad5
 ```
