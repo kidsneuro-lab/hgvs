@@ -18,12 +18,11 @@ def get_translation(hgvs_c):
 
     response = requests.get(server+ext, headers={"Content-Type":"application/json"}, timeout=timeout)
     if not response.ok:
-        response.raise_for_status()
-        sys.exit()
+        return hgvs_c, False, None, None, None, None
     json = response.json()
     # Parse output json into its component values
     chrom, pos, ref, alt = json[0][list(json[0].keys())[0]]['vcf_string'][0].split("-")
-    return hgvs_c, chrom, int(pos), ref, alt
+    return hgvs_c, True, chrom, int(pos), ref, alt
 
 
 if __name__ == "__main__":
@@ -46,7 +45,7 @@ if __name__ == "__main__":
     # write file header, overwriting the existing file
     with open(output_file, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file, delimiter=',')
-        writer.writerow(["HGVS","Chromosome", "Position", "Ref", "Alt"])
+        writer.writerow(["HGVS", "Success", "Chromosome", "Position", "Ref", "Alt"])
 
     # Lookup the ensembl API for each row and save the result in a matching file
     for row in data:
