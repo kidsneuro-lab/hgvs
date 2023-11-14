@@ -8,4 +8,4 @@ Having them pre-translated means we can run out tests quickly locally, and just 
 python download.py ../hgvs_vcf_valid.tsv output.csv
 ```
 
-- Runtime is estimated at a couple of hours.
+- Runtime is estimated at a couple of hours. While it is possible to reduce this with parallel requests its best not to as the ensembl service is unreliable.
