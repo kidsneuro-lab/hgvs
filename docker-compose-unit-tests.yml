@@ -9,3 +9,4 @@ services:
     environment:
       - FASTA=tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa
       - REFGENE=tests/fixtures/genes.refGene
+    command: ["pytest", "-m", "not http and not db"]
