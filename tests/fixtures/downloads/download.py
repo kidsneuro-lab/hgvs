@@ -86,19 +86,19 @@ if __name__ == "__main__":
         writer = csv.writer(file, delimiter=',')
         writer.writerow(["HGVS", "Success", "Chromosome", "Position", "Ref", "Alt"])
 
-    # Lookup the ensembl API for each row and save the result in a matching file
+    # Lookup both APIs for each row and save the results
     for row in data:
         hgvs_c = row.get(hgvs_column_name)
         
         print(f"Progress {position}/{total}")
         
-        # write row, appending the existing file
+        # Lookup ensebl, write row, appending the existing file
         result1 = get_translation_ensembl(hgvs_c)
         with open(output_file1, 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file, delimiter=',')
             writer.writerow(result1)
             
-        # write row, appending the existing file        
+        # Lookup variant validator, write row, appending the existing file        
         result2 = get_translation_variant_validator(hgvs_c)
         with open(output_file2, 'a', newline='', encoding='utf-8') as file:
             writer = csv.writer(file, delimiter=',')
