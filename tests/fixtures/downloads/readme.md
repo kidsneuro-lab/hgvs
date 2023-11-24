@@ -8,4 +8,9 @@ Having them pre-translated means we can run out tests quickly locally, and just 
 python download.py ../hgvs_vcf_valid.tsv output_ensemble.csv output_variant_validator.csv
 ```
 
+- To compare the results of the two files, use vscode
+```shell
+code --diff tests/fixtures/downloads/output_ensemble.csv tests/fixtures/downloads/output_variant_validat
+or.csv 
+```
 - Runtime is estimated at a couple of hours. While it is possible to reduce this with parallel requests its best not to as the ensembl service is unreliable.
