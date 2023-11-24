@@ -1,5 +1,6 @@
 import csv, sys
 import requests
+from requests.adapters import HTTPAdapter, Retry
 
 import csv
 
@@ -11,13 +12,25 @@ def read_tsv(file_path):
             rows.append(row)
     return rows
 
+def call_http(server, url):
+    timeout = 90
+    s = requests.Session()
+
+    retries = Retry(total=5,
+                    backoff_factor=0.1,
+                    status_forcelist=[ 500, 501, 502, 503, 504 ])
+
+    s.mount('https://', HTTPAdapter(max_retries=retries))
+
+    response = s.get(server+url, headers={"Content-Type":"application/json"}, timeout=timeout)
+    return response
+
 def get_translation_variant_validator(hgvs_c):
     print (f"\tChecking variant validator")
     server = "https://rest.variantvalidator.org"
     url = "/VariantValidator/variantvalidator/GRCh38/{}/select".format(hgvs_c)
-    timeout = 90
 
-    response = requests.get(server+url, headers={"Content-Type":"application/json"}, timeout=timeout)
+    response = call_http(server, url)
     if not response.ok:
         return hgvs_c, False, None, None, None, None
 
@@ -33,13 +46,13 @@ def get_translation_variant_validator(hgvs_c):
 
     return hgvs_c, True, chromosome, int(position), reference, alternate
 
+
 def get_translation_ensembl(hgvs_c):
     print (f"\tChecking ensembl")
     server = "https://rest.ensembl.org"
     url = "/variant_recoder/human/{}?fields=None&vcf_string=1".format(hgvs_c)
-    timeout = 90
-
-    response = requests.get(server+url, headers={"Content-Type":"application/json"}, timeout=timeout)
+   
+    response = call_http(server, url)
     if not response.ok:
         return hgvs_c, False, None, None, None, None
 
