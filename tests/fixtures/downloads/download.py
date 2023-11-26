@@ -3,6 +3,25 @@ import requests
 from requests.adapters import HTTPAdapter, Retry
 
 import csv
+import time
+from functools import wraps
+
+def retry(num_attempts, delay_seconds):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while attempts < num_attempts:
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    attempts += 1
+                    if attempts == num_attempts:
+                        raise
+                    print(f"Attempt {attempts} failed, retrying in {delay_seconds} seconds...")
+                    time.sleep(delay_seconds)
+        return wrapper
+    return decorator
 
 def read_tsv(file_path):
     rows = []
@@ -12,11 +31,12 @@ def read_tsv(file_path):
             rows.append(row)
     return rows
 
+@retry(num_attempts=3, delay_seconds=2)
 def call_http(server, url):
     timeout = 90
     s = requests.Session()
 
-    retries = Retry(total=5,
+    retries = Retry(total=10,
                     backoff_factor=0.1,
                     status_forcelist=[ 500, 501, 502, 503, 504 ])
 
@@ -30,21 +50,27 @@ def get_translation_variant_validator(hgvs_c):
     server = "https://rest.variantvalidator.org"
     url = "/VariantValidator/variantvalidator/GRCh38/{}/select".format(hgvs_c)
 
-    response = call_http(server, url)
-    if not response.ok:
+    try:
+        response = call_http(server, url)
+        if not response.ok:
+            return hgvs_c, False, None, None, None, None
+
+        json = response.json()
+        hg38_data = json[hgvs_c]["primary_assembly_loci"]["hg38"]["vcf"]
+
+        chromosome = hg38_data.get("chr").replace("chr", "")
+        position =  int(hg38_data.get("pos"))
+        reference = hg38_data.get("ref")
+        alternate = hg38_data.get("alt")
+        print (f"\t\tFound {chromosome}:{position}:{reference}:{alternate}")
+
+        return hgvs_c, True, chromosome, int(position), reference, alternate
+    except KeyError:
+        print (f"\t\t'Key Error for {hgvs_c}")
         return hgvs_c, False, None, None, None, None
-
-    json = response.json()
-
-    hg38_data = json[hgvs_c]["primary_assembly_loci"]["hg38"]["vcf"]
-
-    chromosome = hg38_data.get("chr").replace("chr", "")
-    position =  int(hg38_data.get("pos"))
-    reference = hg38_data.get("ref")
-    alternate = hg38_data.get("alt")
-    print (f"\t\tAccepting {chromosome}:{position}:{reference}:{alternate}")
-
-    return hgvs_c, True, chromosome, int(position), reference, alternate
+    except Exception as e:
+        print (f"\t\t'Error for {hgvs_c} {e}")
+        return hgvs_c, False, None, None, None, None
 
 
 def get_translation_ensembl(hgvs_c):
@@ -52,25 +78,29 @@ def get_translation_ensembl(hgvs_c):
     server = "https://rest.ensembl.org"
     url = "/variant_recoder/human/{}?fields=None&vcf_string=1".format(hgvs_c)
    
-    response = call_http(server, url)
-    if not response.ok:
+    try:
+        response = call_http(server, url)
+        if not response.ok:
+            return hgvs_c, False, None, None, None, None
+
+        json = response.json()
+
+        # Find the entry for the X chromosome
+        for entry in json:
+            key = list(entry.keys())[0]
+            for item in entry[key]['vcf_string']:
+                chromosome, position, reference, alternate = item.split("-")
+                if chromosome == "X":
+                    print (f"\t\tFound {chromosome}:{position}:{reference}:{alternate}")
+                    return hgvs_c, True, chromosome, int(position), reference, alternate
+                else:
+                    print (f"\t\tIgnoring {chromosome}:{position}:{reference}:{alternate}")
+
+        print (f"None found")
         return hgvs_c, False, None, None, None, None
-
-    json = response.json()
-
-    # Find the entry for the X chromosome
-    for entry in json:
-        key = list(entry.keys())[0]
-        for item in entry[key]['vcf_string']:
-            chromosome, position, reference, alternate = item.split("-")
-            if chromosome == "X":
-                print (f"\t\tAccepting {chromosome}:{position}:{reference}:{alternate}")
-                return hgvs_c, True, chromosome, int(position), reference, alternate
-            else:
-                print (f"\t\tIgnoring {chromosome}:{position}:{reference}:{alternate}")
-
-    print (f"None found")
-    return hgvs_c, False, None, None, None, None
+    except Exception as e:
+        print (f"\t\t'Error for {hgvs_c} {e}")
+        return hgvs_c, False, None, None, None, None
 
 
 if __name__ == "__main__":
