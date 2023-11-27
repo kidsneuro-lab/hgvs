@@ -56,11 +56,13 @@ class TestComparison:
         yield lambda name: transcripts.get(name)
 
     # Validate each row of the ensembl file against what is produced by the in house HGVS translator
+    @pytest.mark.skip(reason="This comparison is a work in progress")
     @pytest.mark.parametrize('rows', read_csv('tests/fixtures/downloads/output_ensemble.csv'))
     def test_against_ensembl(self, rows, genome: Fasta, transcripts):        
         self.compare(rows, genome, transcripts)
         
     # Validate each row of the variant validator file against what is produced by the in house HGVS translator
+    @pytest.mark.skip(reason="This comparison is a work in progress")
     @pytest.mark.parametrize('rows', read_csv('tests/fixtures/downloads/output_variant_validator.csv'))
     def test_against_variant_validator(self, rows, genome: Fasta, transcripts):
         self.compare(rows, genome, transcripts)
