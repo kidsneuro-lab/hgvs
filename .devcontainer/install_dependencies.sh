@@ -1,11 +1,13 @@
+#!/bin/bash
+set -e
 
 BCFTOOLS_VERSION="1.18"
 
-# ensure we are not in ./devcontainer
-cd /workspaces/hgvs
-
 sudo apt-get update
 sudo apt-get install -y wget build-essential bzip2 libz-dev liblzma-dev libbz2-dev libcurl4-openssl-dev
+
+mkdir bin
+cd bin
 
 # Install bcftools
 wget -q https://github.com/samtools/bcftools/releases/download/$BCFTOOLS_VERSION/bcftools-$BCFTOOLS_VERSION.tar.bz2
