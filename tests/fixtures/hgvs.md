@@ -1,8 +1,5 @@
 ## Validation 
-In order to validate the HGVS standalone we
-- Started with list of valid variants [hgvs_vcf_valid.tsv](hgvs_vcf_valid.tsv)
-
-- Diff'd the two normalised files.
+The below steps were executed to investigate if the conversion from hgvs to genomic coordinates works as well using this library as using hte ensembl or variant validator REST API's
 
 ### Third Party API Differences
 Using two third party API's to convert them into genomic co-ordinates
@@ -141,6 +138,25 @@ NM_000533.5:c.453+28_453+46del,True,X,103786753,ATAACAAG      | NM_000533.5:c.45
 NM_014271.4:c.894_903del,True,X,29917578,TTTGGGAAAGT,T        | NM_014271.4:c.894_903del,True,X,29917575,GAGTTTGGGAA,G
 ```
 
+### Third Party API Failures
+These items failed when attempting to look them up against the third party APIs hence were missing from the normalisation step.
+The overlap suggests the variants themselves might be wrong?
+
+- Failed the Ensembl Api
+    ```
+    NM_001042351.3:c.-9+340=
+    NM_002764.3:c.-153delG
+    NM_001099857.5:c.518+118=
+    NM_001012989.3:c.350A>G
+    ```
+
+- Failed Variant Validator Api
+    ```
+    NM_001353921.2:c.31-29709dup
+    NM_002764.3:c.-153delG
+    NM_001012989.3:c.350A>G
+    ```
+
 ### Normalisation
 
 Converted the files into a VCF, sorted then normalised them using BCFTools
@@ -178,25 +194,4 @@ chrX    124061743       NM_001042750.2:c.1535-15_1535-3del    <
 - `NM_001353921.2:c.31-29709dup` - this failed the api variant validator api lookup
 - `NM_001042351.3:c.-9+340=` this failed the ensembl api lookup
 - `NM_001099857.5:c.518+118=` this failed the ensembl api lookup
-- `NM_001042750.2:c.1535-15_1535-3del` There appears to be a case difference but the diff is case insensitive, not sure what else if different
-
-### Third Party API Failures
-These items failed when attempting to look them up against the third party APIs hence were missing from the normalisation step.
-- Failed both API's
-    ```
-    NM_001042351.3:c.-9+340=
-    NM_002764.3:c.-153delG
-    NM_001099857.5:c.518+118=
-    ```
-- Failed the Ensembl Api
-    ```
-    NM_001012989.3:c.350A>G
-    ```
-
-- Failed Variant Validator Api
-    ```
-    NM_001042351.3:c.-9+340=
-    NM_002764.3:c.-153delG
-    NM_001099857.5:c.518+118=
-    NM_001012989.3:c.350A>G
-    ```
+- `NM_001042750.2:c.1535-15_1535-3del` There appears to be a case difference but the diff command was case insensitive, not sure what else is different
