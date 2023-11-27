@@ -19,5 +19,5 @@ jobs:
     - name: Download refGene (sample dataset for tests)
       run: ./download_refGene.sh -hg38_sample
 
-    - name: Build Tests
+    - name: Run Tests
       run: ./run-tests.sh
