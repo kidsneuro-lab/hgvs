@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/python
 {
-	"name": "Python 3",
+	"name": "Python 3 + bcftools",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"image": "mcr.microsoft.com/devcontainers/python:3.10-bookworm",
 	"features": {
@@ -20,7 +20,7 @@
 	"forwardPorts": [8002],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip3 install --user -r requirements.txt; pip3 install --user -r requirements-dev.txt; "
+	"postCreateCommand": "pip3 install --user -r requirements.txt; pip3 install --user -r requirements-dev.txt;bash ./.devcontainer/install_dependencies.sh"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
