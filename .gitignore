@@ -51,3 +51,4 @@ reference
 tests/fixtures/*.fa**
 
 **/.DS_Store
+/bcftools*
