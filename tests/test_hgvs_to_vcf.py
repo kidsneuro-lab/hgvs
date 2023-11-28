@@ -31,7 +31,7 @@ class TestID:
     @staticmethod
     def idfn1(data: dict) -> str:
         return data['hgvs_c']
-    
+ 
 class TestHgvsToVCF:
     @pytest.fixture(scope="class")
     def genome(self):
