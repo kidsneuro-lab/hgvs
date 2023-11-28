@@ -3,10 +3,11 @@ from __future__ import unicode_literals
 
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from typing import Tuple,List
 from pyfaidx import Fasta
 import pyhgvs as hgvs
+from pyhgvs.models.hgvs_name import InvalidHGVSName
 import pyhgvs.utils as hgvs_utils
 import logging
 
@@ -58,18 +59,36 @@ def get_ready():
 @app.get("/translate", response_model=Tuple[str, int, str, str])
 def translate_hgvs(value: str):
     logger.info('Translating %s', value)
-    chrom, offset, ref, alt = hgvs.parse_hgvs_name(value, genome, get_transcript=get_transcript)
-    logger.info('Translated %s to: %s %s %s %s', value, chrom, offset, ref, alt)
-    return chrom, offset, ref, alt
+    try:
+        chrom, offset, ref, alt = hgvs.parse_hgvs_name(value, genome, get_transcript=get_transcript)
+        logger.info('Translated %s to: %s %s %s %s', value, chrom, offset, ref, alt)
+        return chrom, offset, ref, alt
+    except InvalidHGVSName:
+        error_message = f"Invalid HGVS Name:'{value}'"
+        logging.error(error_message)
+        raise HTTPException(status_code=400, detail=error_message)
+    except ValueError as e:
+        error_message = str(e)
+        logging.error(error_message)
+        raise HTTPException(status_code=500, detail=error_message)
 
 @app.post("/translate_bulk")
 def translate_hgvs_bulk(values: List[str]):
     translations = []
     logger.info('Translating %s values', {len(values)})
-    for value in values:
-        chrom, offset, ref, alt = hgvs.parse_hgvs_name(value, genome, get_transcript=get_transcript)
-        translations.append((value, chrom, offset, ref, alt))
-    return translations
-
+    try:
+        for value in values:
+            chrom, offset, ref, alt = hgvs.parse_hgvs_name(value, genome, get_transcript=get_transcript)
+            translations.append((value, chrom, offset, ref, alt))
+        return translations
+    except InvalidHGVSName:
+        error_message = f"Invalid HGVS Name:'{value}'"
+        logging.error(error_message)
+        raise HTTPException(status_code=400, detail=error_message)
+    except ValueError as e:
+        error_message = str(e)
+        logging.error(error_message)
+        raise HTTPException(status_code=500, detail=error_message)
+    
 if __name__ == '__main__':
     app.run(debug=True)

@@ -170,7 +170,7 @@ a different genome sequence back-end, see
 
 # Docker Image
 
-The docker image is known as 'schnknc/hgvs' and is available here [https://hub.docker.com/r/schnknc/hgvs](https://hub.docker.com/r/schnknc/hgvs)
+The docker image is `schnknc/hgvs` and is available here [https://hub.docker.com/r/schnknc/hgvs](https://hub.docker.com/r/schnknc/hgvs)
 
 - Pull latest master build
 ```
@@ -179,4 +179,59 @@ docker pull schnknc/hgvs:master
 - Pull a build of a specific github SHA
 ```
 docker pull schnknc/hgvs:sha-b7d3ad5
+```
+
+```shell
+./download_refGene.sh -hg38
+docker build . -t hgvs
+docker run -p 8002:8002 hgvs
+or
+docker compose up
+```
+# API
+
+## Translate Endpoint
+
+### Valid Requests examples
+```shell
+curl "http://localhost:8002/translate?value=NM_001110556.2:c.3396G>T"
+
+["chrX",154360399,"C","A"]
+```
+
+```shell
+curl "http://localhost:8002/translate?value=NM_000284.4:c.1172_*3del"
+
+["chrX",19359651,"TAAGGG","T"]
+```
+### Invalid Requests examples
+
+```shell
+curl "http://localhost:8002/translate?value=XXXXXXXXXXXXXXXXXXX"
+
+{"detail":"Invalid HGVS Name:'XXXXXXXXXXXXXXXXXXX'"}
+```
+
+```shell
+curl  "http://localhost:8002/translate?value=NM_000352.3:c.215A>G"
+
+{"detail":"transcript is required"}
+```
+
+## Bulk Translate Endpoint
+
+### Valid Requests examples
+
+```shell
+curl -H 'Content-Type: application/json' -X POST -d '["NM_001110556.2:c.3396G>T", "NM_000284.4:c.1172_*3del"]' localhost:8002/translate_bulk
+
+[["NM_001110556.2:c.3396G>T","chrX",154360399,"C","A"],["NM_000284.4:c.1172_*3del","chrX",19359651,"TAAGGG","T"]]
+```
+
+### Invalid Requests examples
+
+```shell
+curl -H 'Content-Type: application/json' -X POST -d '["XXXXX", "YYYYYYY"]' localhost:8002/translate_bulk
+
+{"detail":"Invalid HGVS Name:'XXXXX'"}
 ```
