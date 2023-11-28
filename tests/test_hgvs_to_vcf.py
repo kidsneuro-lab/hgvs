@@ -31,8 +31,7 @@ class TestID:
     @staticmethod
     def idfn1(data: dict) -> str:
         return data['hgvs_c']
-
-@pytest.mark.skip(reason="Requires FASTA assembly file to be present")    
+ 
 class TestHgvsToVCF:
     @pytest.fixture(scope="class")
     def genome(self):
@@ -57,6 +56,7 @@ class TestHgvsToVCF:
             transcripts = hgvs_utils.read_transcripts(infile)
         yield lambda name: transcripts.get(name)
 
+    @pytest.mark.skip(reason="Requires FASTA assembly file to be present")   
     @pytest.mark.parametrize('hgvs_vcf_data', read_fixture_data("tests/fixtures/hgvs_vcf_valid.tsv"), ids=TestID.idfn1)
     def test_valid_hgvs(self, hgvs_vcf_data, genome: Fasta, transcripts):
         chr, pos, ref, alt = hgvs.parse_hgvs_name(hgvs_name=hgvs_vcf_data['hgvs_c'], genome=genome, get_transcript=transcripts, lazy=True)
@@ -68,6 +68,7 @@ class TestHgvsToVCF:
 
         assert scenario_1 or scenario_2
 
+    @pytest.mark.skip(reason="Requires FASTA assembly file to be present")   
     @pytest.mark.parametrize('hgvs_vcf_data', read_fixture_data("tests/fixtures/hgvs_vcf_invalid.tsv"), ids=TestID.idfn1)
     def test_invalid_hgvs(self, hgvs_vcf_data, genome: Fasta, transcripts):
         with pytest.raises(InvalidHGVSName):
