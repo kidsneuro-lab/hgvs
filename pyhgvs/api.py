@@ -11,6 +11,7 @@ import pyhgvs as hgvs
 from pyhgvs.models.hgvs_name import InvalidHGVSName
 import pyhgvs.utils as hgvs_utils
 import logging
+import logging.config
 
 logging.config.fileConfig('pyhgvs/logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
