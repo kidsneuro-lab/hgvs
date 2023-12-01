@@ -2,8 +2,9 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import os
+from pathlib import Path
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from typing import Tuple,List
 from pyfaidx import Fasta
 import pyhgvs as hgvs
@@ -56,8 +57,10 @@ def get_alive():
 def get_ready():
     return {"status": "ready"}
 
-@app.get("/translate", response_model=Tuple[str, int, str, str])
-def translate_hgvs(value: str):
+@app.post("/translate", response_model=Tuple[str, int, str, str])
+async def translate_hgvs(request: Request):
+    data = await request.json()
+    value = data.get("value")
     logger.info('Translating %s', value)
     try:
         chrom, offset, ref, alt = hgvs.parse_hgvs_name(value, genome, get_transcript=get_transcript)
