@@ -15,6 +15,7 @@
             },
             "args": [
                 "pyhgvs.api:app",
+                "--port", "9001",
                 "--reload"
             ],
             "jinja": true,

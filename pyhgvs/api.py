@@ -3,15 +3,20 @@ from __future__ import unicode_literals
 
 import os
 from pathlib import Path
+import logging
+import traceback
 
 from fastapi import FastAPI, HTTPException, Request
 from typing import Tuple,List
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from pyfaidx import Fasta
+import logging.config
+from pydantic import BaseModel
+
 import pyhgvs as hgvs
 from pyhgvs.models.hgvs_name import InvalidHGVSName
 import pyhgvs.utils as hgvs_utils
-import logging
-import logging.config
 
 logging.config.fileConfig('pyhgvs/logging.conf', disable_existing_loggers=False)
 logger = logging.getLogger(__name__)
@@ -42,6 +47,32 @@ if not os.path.exists(refgene):
 with open(refgene) as infile:
     transcripts = hgvs_utils.read_transcripts(infile)
 
+class VCFVariant(BaseModel):
+    input: str
+    chr: str | None
+    pos: int | None
+    ref: str | None
+    alt: str | None
+    message: str | None
+    
+class HgvsSingleVariantRequest(BaseModel):
+    input: str
+    normalise: bool | None = False
+    ignore_version: bool | None = False
+    indels_start_with_same_base: bool | None = False
+
+class HgvsSingleVariantResponse(BaseModel):
+    response: VCFVariant
+
+class HgvsMultipleVariantRequest(BaseModel):
+    input: list[str]
+    normalise: bool | None = False
+    ignore_version: bool | None = False
+    indels_start_with_same_base: bool | None = False
+
+class HgvsMultipleVariantResponse(BaseModel):
+    response: list[VCFVariant]
+
 # Provide a callback for fetching a transcript by its name.
 def get_transcript(name):
     return transcripts.get(name)
@@ -58,41 +89,80 @@ def get_alive():
 def get_ready():
     return {"status": "ready"}
 
-@app.post("/translate", response_model=Tuple[str, int, str, str])
-async def translate_hgvs(request: Request):
-    data = await request.json()
-    value = data.get("value")
-    logger.info('Translating %s', value)
-    try:
-        chrom, offset, ref, alt = hgvs.parse_hgvs_name(value, genome, get_transcript=get_transcript)
-        logger.info('Translated %s to: %s %s %s %s', value, chrom, offset, ref, alt)
-        return chrom, offset, ref, alt
-    except InvalidHGVSName:
-        error_message = f"Invalid HGVS Name:'{value}'"
-        logging.error(error_message)
-        raise HTTPException(status_code=400, detail=error_message)
-    except ValueError as e:
-        error_message = str(e)
-        logging.error(error_message)
-        raise HTTPException(status_code=500, detail=error_message)
+class DefaultException(Exception):
+    def __init__(self, status_code: int, error: str):
+        self.status_code = status_code
+        self.error = error
 
-@app.post("/translate_bulk")
-def translate_hgvs_bulk(values: List[str]):
-    translations = []
-    logger.info('Translating %s values', {len(values)})
+@app.exception_handler(DefaultException)
+async def unicorn_exception_handler(request: Request, exc: DefaultException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={'error': exc},
+    )
+
+@app.post("/translate", response_model=HgvsSingleVariantResponse)
+async def translate_hgvs(request: HgvsSingleVariantRequest):
+    logger.info('Translating %s', request.input)
     try:
-        for value in values:
-            chrom, offset, ref, alt = hgvs.parse_hgvs_name(value, genome, get_transcript=get_transcript)
-            translations.append((value, chrom, offset, ref, alt))
-        return translations
-    except InvalidHGVSName:
-        error_message = f"Invalid HGVS Name:'{value}'"
-        logging.error(error_message)
-        raise HTTPException(status_code=400, detail=error_message)
+        chrom, offset, ref, alt = hgvs.parse_hgvs_name(hgvs_name=request.input, 
+                                                       genome=genome, 
+                                                       get_transcript=get_transcript,
+                                                       lazy=request.ignore_version,
+                                                       normalize=request.normalise,
+                                                       indels_start_with_same_base=request.indels_start_with_same_base)
+        logger.info('Translated %s to: %s %s %s %s', request.input, chrom, offset, ref, alt)
+        return HgvsSingleVariantResponse(response=VCFVariant(input=request.input, chr=chrom, pos=offset, ref=ref, alt=alt, message=None))
+
+    except InvalidHGVSName as e:
+        logging.error(f"Invalid HGVS Name:'{request.input}'")
+        raise HTTPException(status_code=400, detail=jsonable_encoder(
+            {'error': {'summary':f"Invalid HGVS Name:'{request.input}'",
+                       'details': None}}))
     except ValueError as e:
-        error_message = str(e)
-        logging.error(error_message)
-        raise HTTPException(status_code=500, detail=error_message)
+        logging.error(e)
+        raise HTTPException(status_code=400, detail=jsonable_encoder(
+            {'error': {'summary': str(e),
+                       'details': None}}))
+    except Exception as e:
+        logger.error(e)
+        traceback.print_exc()
+        raise DefaultException(status_code=500, detail=jsonable_encoder(
+            {'error': {'summary':'Unknown error occurred',
+                       'details': str(e)}}))
+
+@app.post("/translate_bulk", response_model=HgvsMultipleVariantResponse)
+def translate_hgvs_bulk(request: HgvsMultipleVariantRequest):
+    vcf_variants_list = []
+    logger.info('Translating %s values', {len(request.input)})
+    try:
+        for input in request.input:
+            try:
+                chrom, offset, ref, alt = hgvs.parse_hgvs_name(hgvs_name=input, 
+                                                               genome=genome, 
+                                                               get_transcript=get_transcript,
+                                                               lazy=request.ignore_version,
+                                                               normalize=request.normalise,
+                                                               indels_start_with_same_base=request.indels_start_with_same_base)
+                vcf_variant = VCFVariant(input=input, chr=chrom, pos=offset, ref=ref, alt=alt, message=None)
+                
+            except InvalidHGVSName as e:
+                logging.error(f"Invalid HGVS Name:'{input}'")
+                vcf_variant = VCFVariant(input=input, chr=None, pos=None, ref=None, alt=None, message=f"Invalid HGVS Name:'{input}'")
+            
+            vcf_variants_list.append(vcf_variant)
+        return HgvsMultipleVariantResponse(response=vcf_variants_list)
+    except ValueError as e:
+        logging.error(e)
+        raise HTTPException(status_code=400, detail=jsonable_encoder(
+            {'error': {'summary': str(e),
+                       'details': None}}))
+    except Exception as e:
+        logger.error(e)
+        traceback.print_exc()
+        raise DefaultException(status_code=500, detail=jsonable_encoder(
+            {'error': {'summary':'Unknown error occurred',
+                       'details': str(e)}}))
     
 if __name__ == '__main__':
     app.run(debug=True)
