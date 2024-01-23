@@ -47,3 +47,6 @@ nosetests.xml
 dist
 .git
 .devcontainer
+
+# Ignore generated files
+**/*.pyc
