@@ -16,9 +16,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
+    - name: Download refGene (sample dataset for tests)
+      run: ./download_refGene.sh -hg38_sample
 
     - name: Run tests
       run: ./run-tests.sh
+
+    - name: Cleanup
+      run: |
+        echo "Removing test fixtures"
+        rm -f tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa*
+        rm -f tests/fixtures/genes.refGene
+        rm -f tests/fixtures/LRG_RefSeqGene
     
     - name: Download refGene
       run: ./download_refGene.sh -hg38
