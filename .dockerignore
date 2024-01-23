@@ -43,3 +43,7 @@ nosetests.xml
 .project
 .pydevproject
 .idea
+
+dist
+.git
+.devcontainer

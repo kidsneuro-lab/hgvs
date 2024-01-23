@@ -3,7 +3,7 @@
 {
 	"name": "Python 3 + bcftools",
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"image": "mcr.microsoft.com/devcontainers/python:3.10-bookworm",
+	"image": "mcr.microsoft.com/devcontainers/python:3.10-bullseye",
 	"features": {
 		"ghcr.io/jungaretti/features/make:1": {}
 	},
@@ -17,10 +17,17 @@
 	// "features": {},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [8002],
+	"forwardPorts": [9001],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "bash .devcontainer/setup_python.sh; bash .devcontainer/setup_dependencies.sh"
+	"postCreateCommand": "bash .devcontainer/setup_python.sh; bash .devcontainer/setup_dependencies.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"alexkrechik.cucumberautocomplete"
+			]
+		}
+	}
 
 	// Configure tool-specific properties.
 	// "customizations": {},

@@ -16,6 +16,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Run tests
+      run: ./run-tests.sh
     
     - name: Download refGene
       run: ./download_refGene.sh -hg38
