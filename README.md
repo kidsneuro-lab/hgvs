@@ -190,48 +190,214 @@ docker compose up
 ```
 # API
 
+### Parameters
+|Parameter|Description  |
+|--|--|
+| normalise | If True, Normalise allele according to VCF standard  |
+| ignore_version | If True, Ignore version from input transcript/gene |
+| indels_start_with_same_base | If True, When normalising, don't strip common prefix from indels |
+
 ## Translate Endpoint
 
 ### Valid Requests examples
-```shell
-curl "http://localhost:8002/translate?value=NM_001110556.2:c.3396G>T"
 
-["chrX",154360399,"C","A"]
+#### Example 1
+* Single variant
+
+**Request**
+```shell
+## Request
+curl -X "POST" "http://127.0.0.1:9001/translate" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "indels_start_with_same_base": true,
+  "ignore_version": true,
+  "input": "NM_001034853.2:c.778+1del",
+  "normalise": true
+}'
 ```
 
-```shell
-curl "http://localhost:8002/translate?value=NM_000284.4:c.1172_*3del"
-
-["chrX",19359651,"TAAGGG","T"]
+**Response**
+```json
+{
+  "response": {
+    "input": "NM_001034853.2:c.778+1del",
+    "chr": "X",
+    "pos": 38310613,
+    "ref": "AC",
+    "alt": "A",
+    "message": null
+  }
+}
 ```
+
+#### Example 2
+* Single indel variant
+
+**Request**
+```shell
+curl -X "POST" "http://127.0.0.1:9001/translate" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "indels_start_with_same_base": true,
+  "ignore_version": true,
+  "input": "NM_173495.3:c.1835_1839delinsGAA",
+  "normalise": true
+}'
+```
+
+**Response**
+```
+{
+  "response": {
+    "input": "NM_173495.3:c.1835_1839delinsGAA",
+    "chr": "X",
+    "pos": 23393352,
+    "ref": "ATGTTG",
+    "alt": "AGAA",
+    "message": null
+  }
+}
+```
+#### Example 3
+* Single indel variant
+* If indels start with same base, ignore first base in output
+
+**Request**
+```shell
+curl -X "POST" "http://127.0.0.1:9001/translate" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "indels_start_with_same_base": false,
+  "ignore_version": true,
+  "input": "NM_173495.3:c.1835_1839delinsGAA",
+  "normalise": true
+}'
+```
+
+**Response**
+```
+{
+  "response": {
+    "input": "NM_173495.3:c.1835_1839delinsGAA",
+    "chr": "X",
+    "pos": 23393353,
+    "ref": "TGTTG",
+    "alt": "GAA",
+    "message": null
+  }
+}
+```
+
+
 ### Invalid Requests examples
 
+#### Example1
+**Request**
 ```shell
-curl "http://localhost:8002/translate?value=XXXXXXXXXXXXXXXXXXX"
-
-{"detail":"Invalid HGVS Name:'XXXXXXXXXXXXXXXXXXX'"}
+curl -X "POST" "http://127.0.0.1:9001/translate" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "indels_start_with_same_base": true,
+  "ignore_version": false,
+  "input": "xyz",
+  "normalise": false
+}'
 ```
 
-```shell
-curl  "http://localhost:8002/translate?value=NM_000352.3:c.215A>G"
-
-{"detail":"transcript is required"}
+**Response**
+```json
+{
+  "detail": {
+    "error": {
+      "summary": "Invalid HGVS Name:'xyz'",
+      "details": null
+    }
+  }
+}
 ```
 
 ## Bulk Translate Endpoint
 
 ### Valid Requests examples
 
+**Request**
 ```shell
-curl -H 'Content-Type: application/json' -X POST -d '["NM_001110556.2:c.3396G>T", "NM_000284.4:c.1172_*3del"]' localhost:8002/translate_bulk
+curl -X "POST" "http://127.0.0.1:9001/translate_bulk" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "indels_start_with_same_base": false,
+  "ignore_version": false,
+  "input": [
+    "NM_031407.7:c.1237T>C",
+    "NM_031407.7:c.2538T>A"
+  ],
+  "normalise": false
+}'
+```
 
-[["NM_001110556.2:c.3396G>T","chrX",154360399,"C","A"],["NM_000284.4:c.1172_*3del","chrX",19359651,"TAAGGG","T"]]
+**Response**
+```json
+{
+  "response": [
+    {
+      "input": "NM_031407.7:c.1237T>C",
+      "chr": "X",
+      "pos": 53628498,
+      "ref": "A",
+      "alt": "G",
+      "message": null
+    },
+    {
+      "input": "NM_031407.7:c.2538T>A",
+      "chr": "X",
+      "pos": 53604793,
+      "ref": "A",
+      "alt": "T",
+      "message": null
+    }
+  ]
+}
 ```
 
 ### Invalid Requests examples
 
+**Request**
 ```shell
-curl -H 'Content-Type: application/json' -X POST -d '["XXXXX", "YYYYYYY"]' localhost:8002/translate_bulk
+curl -X "POST" "http://127.0.0.1:9001/translate_bulk" \
+     -H 'Content-Type: application/json; charset=utf-8' \
+     -d $'{
+  "indels_start_with_same_base": false,
+  "ignore_version": false,
+  "input": [
+    "XYZ",
+    "NM_031407.7:c.2538T>A"
+  ],
+  "normalise": false
+}'
 
-{"detail":"Invalid HGVS Name:'XXXXX'"}
+```
+
+**Response**
+```json
+{
+  "response": [
+    {
+      "input": "XYZ",
+      "chr": null,
+      "pos": null,
+      "ref": null,
+      "alt": null,
+      "message": "Invalid HGVS Name:'XYZ'"
+    },
+    {
+      "input": "NM_031407.7:c.2538T>A",
+      "chr": "X",
+      "pos": 53604793,
+      "ref": "A",
+      "alt": "T",
+      "message": null
+    }
+  ]
+}
 ```
