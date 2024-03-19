@@ -60,6 +60,7 @@ class HgvsSingleVariantRequest(BaseModel):
     normalise: bool | None = False
     ignore_version: bool | None = False
     indels_start_with_same_base: bool | None = False
+    prioritise_X_over_Y: bool | None = False
 
 class HgvsSingleVariantResponse(BaseModel):
     response: VCFVariant
@@ -69,13 +70,38 @@ class HgvsMultipleVariantRequest(BaseModel):
     normalise: bool | None = False
     ignore_version: bool | None = False
     indels_start_with_same_base: bool | None = False
+    prioritise_X_over_Y: bool | None = False
 
 class HgvsMultipleVariantResponse(BaseModel):
     response: list[VCFVariant]
 
 # Provide a callback for fetching a transcript by its name.
 def get_transcript(name):
-    return transcripts.get(name)
+    tx = transcripts.get(name)
+
+    if tx is not None:
+        if len(tx) != 1:
+            raise RuntimeError(f"Multiple loci: {', '.join(list(tx.keys()))} found for transcript: {name}")
+        
+        return tx[next(iter(tx))]
+    else:
+        return None
+
+# Provide a callback for fetching a transcript by its name.
+def get_transcript_X_over_Y(name):
+    tx = transcripts.get(name)
+
+    if tx is not None:
+        # Check if both keys 'X' and 'Y' are in the dictionary
+        if 'X' in tx and 'Y' in tx:
+            return tx['X']
+
+        if len(tx) != 1:
+            raise RuntimeError(f"Multiple loci: {', '.join(list(tx.keys()))} found for transcript: {name}")
+        
+        return tx[next(iter(tx))]
+    else:
+        return None
 
 @app.get("/")
 def get_root():
@@ -90,24 +116,25 @@ def get_ready():
     return {"status": "ready"}
 
 class DefaultException(Exception):
-    def __init__(self, status_code: int, error: str):
+    def __init__(self, status_code: int, detail: str):
         self.status_code = status_code
-        self.error = error
+        self.detail = detail
 
 @app.exception_handler(DefaultException)
 async def unicorn_exception_handler(request: Request, exc: DefaultException):
     return JSONResponse(
         status_code=exc.status_code,
-        content={'error': exc},
+        content={'error': exc.detail},
     )
 
 @app.post("/translate", response_model=HgvsSingleVariantResponse)
 async def translate_hgvs(request: HgvsSingleVariantRequest):
     logger.info('Translating %s', request.input)
+    get_transcript_fun = get_transcript_X_over_Y if request.prioritise_X_over_Y else get_transcript
     try:
         chrom, offset, ref, alt = hgvs.parse_hgvs_name(hgvs_name=request.input, 
                                                        genome=genome, 
-                                                       get_transcript=get_transcript,
+                                                       get_transcript=get_transcript_fun,
                                                        lazy=request.ignore_version,
                                                        normalize=request.normalise,
                                                        indels_start_with_same_base=request.indels_start_with_same_base)
@@ -135,12 +162,13 @@ async def translate_hgvs(request: HgvsSingleVariantRequest):
 def translate_hgvs_bulk(request: HgvsMultipleVariantRequest):
     vcf_variants_list = []
     logger.info('Translating %s values', {len(request.input)})
+    get_transcript_fun = get_transcript_X_over_Y if request.prioritise_X_over_Y else get_transcript
     try:
         for input in request.input:
             try:
                 chrom, offset, ref, alt = hgvs.parse_hgvs_name(hgvs_name=input, 
                                                                genome=genome, 
-                                                               get_transcript=get_transcript,
+                                                               get_transcript=get_transcript_fun,
                                                                lazy=request.ignore_version,
                                                                normalize=request.normalise,
                                                                indels_start_with_same_base=request.indels_start_with_same_base)

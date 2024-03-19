@@ -104,7 +104,7 @@ case "$parameter" in
                 r.cdsEndStat,
                 r.exonFrames
             FROM hg38.ncbiRefSeq r
-           WHERE r.chrom = 'chrX'
+           WHERE r.chrom IN ('chrX','chrY')
         ), refGene AS (
             SELECT r.bin,
                 CONCAT(r.name, '.', g.version) AS name,
@@ -123,7 +123,7 @@ case "$parameter" in
                 r.cdsEndStat,
                 r.exonFrames
             FROM hg38.refGene r, hgFixed.gbCdnaInfo g
-            WHERE r.chrom = 'chrX'
+            WHERE r.chrom IN ('chrX','chrY')
             AND r.name = g.acc
         )
         SELECT *
@@ -140,11 +140,17 @@ case "$parameter" in
             wget -nv -c -O tests/fixtures/LRG_RefSeqGene -nv -c https://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/RefSeqGene/LRG_RefSeqGene
         fi
 
-        echo Downloading and indexing hg38 \(chrX\)
-        if [ ! -f tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa.fai ]; then
+        echo Downloading and indexing hg38 \(chrX\) and \(chrY\)
+        if [ ! -f tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa.fai ]; then
             wget -nv -c -O tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz
+            wget -nv -c -O tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.Y.fa.gz https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.Y.fa.gz
             gunzip tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz
-            docker run --rm -v ./tests/fixtures:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/Homo_sapiens.GRCh38.dna.chromosome.X.fa
+            gunzip tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.Y.fa.gz
+            cat tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa > tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa
+            cat tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.Y.fa >> tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa
+            rm tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa
+            rm tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.Y.fa
+            docker run --rm -v ./tests/fixtures:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa
         fi
         ;;
     *)

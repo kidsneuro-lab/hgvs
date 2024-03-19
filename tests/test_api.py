@@ -54,13 +54,13 @@ def transcripts():
 
 @when('the HGVS name is converted to VCF')
 def convert_hgvs_to_vcf(client, hgvs_name):
-    pytest.response1 = client.post(f"/translate", json={'input': hgvs_name, 'ignore_version': True, 'normalise': True})
+    pytest.response1 = client.post(f"/translate", json={'input': hgvs_name, 'ignore_version': True, 'normalise': True, 'prioritise_X_over_Y': True})
     assert pytest.response1.status_code == 200, f"HTTP status code: {pytest.response1.status_code}"
 
-    pytest.response2 = client.post(f"/translate", json={'input': hgvs_name, 'ignore_version': True, 'normalise': False})
+    pytest.response2 = client.post(f"/translate", json={'input': hgvs_name, 'ignore_version': True, 'normalise': False, 'prioritise_X_over_Y': True})
     assert pytest.response2.status_code == 200, f"HTTP status code: {pytest.response2.status_code}"
 
-    pytest.response3 = client.post(f"/translate", json={'input': hgvs_name, 'ignore_version': True, 'indels_start_with_same_base': False})
+    pytest.response3 = client.post(f"/translate", json={'input': hgvs_name, 'ignore_version': True, 'indels_start_with_same_base': False, 'prioritise_X_over_Y': True})
     assert pytest.response3.status_code == 200, f"HTTP status code: {pytest.response3.status_code}"
 
 @when('the HGVS name conversion is attempted')
