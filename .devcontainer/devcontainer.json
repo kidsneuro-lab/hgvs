@@ -9,8 +9,8 @@
 	},
 	"containerEnv": {
 		"PIP_DISABLE_PIP_VERSION_CHECK": "1",
-		"FASTA":"assemblies/hg38.fa",
-		"REFGENE":"reference/genes.refGene"
+		"FASTA":"tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa",
+		"REFGENE":"tests/fixtures/genes.refGene"
 	},
 
 	// Features to add to the dev container. More info: https://containers.dev/features.

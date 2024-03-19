@@ -27,11 +27,12 @@
             "request": "launch",
             "module": "uvicorn",
             "env": {
-                "FASTA": "tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa",
+                "FASTA": "tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa",
                 "REFGENE": "tests/fixtures/genes.refGene"
             },
             "args": [
                 "pyhgvs.api:app",
+                "--port", "9001",
                 "--reload"
             ],
             "jinja": true,
