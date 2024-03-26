@@ -36,7 +36,7 @@ jobs:
       - name: Cleanup
         run: |
           echo "Removing test fixtures"
-          rm -f tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa*
+          rm -f tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa* 
           rm -f tests/fixtures/genes.refGene
           rm -f tests/fixtures/LRG_RefSeqGene
 
