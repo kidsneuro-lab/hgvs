@@ -1,0 +1,48 @@
+name: create_package
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+
+  create_package:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: dev
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          show-progress: 'false'
+
+      - name: Generate version number
+        id: tag_version
+        uses: anothrNick/github-tag-action@1.67.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BUMP: patch
+
+      - name: Build package
+        run: |
+          docker build -f Packager.Dockerfile . -t packager --build-arg VERSION=$VERSION
+          docker run -v $(pwd)/dist:/app/dist packager
+        env:
+          VERSION: ${{ steps.tag_version.outputs.tag }}
+      
+      - name: Upload package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: dist/
+
+      - name: Create github release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.tag_version.outputs.tag }}
+          generateReleaseNotes: true
