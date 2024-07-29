@@ -39,4 +39,4 @@ jobs:
         with:
           tag: ${{ steps.tag_version.outputs.tag }}
           generateReleaseNotes: true
-          artifacts: "dist/*.gz"
+          artifacts: "dist/*.whl"
