@@ -80,7 +80,7 @@ case "$parameter" in
             mkdir -p assemblies
             wget -nv -c -O assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz https://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
             gunzip assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz
-            docker run --rm -v ./assemblies:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa
+            docker run --rm -v ./assemblies:/assemblies bioslimcontainers/samtools:1.20 samtools faidx assemblies/Homo_sapiens.GRCh38.dna.primary_assembly.fa
         fi
         ;;
     "-hg38_sample")
@@ -150,7 +150,7 @@ case "$parameter" in
             cat tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.Y.fa >> tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa
             rm tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.fa
             rm tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.Y.fa
-            docker run --rm -v ./tests/fixtures:/assemblies emihat/alpine-samtools:latest samtools faidx assemblies/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa
+            docker run --rm -v ./tests/fixtures:/assemblies bioslimcontainers/samtools:1.20 samtools faidx assemblies/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa
         fi
         ;;
     *)
