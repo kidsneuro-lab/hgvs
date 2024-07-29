@@ -1,10 +1,9 @@
 name: create_package
+# Creates a HGVS package and attaches it as a build artifact
+# The package is consumed by the base data repository
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
 
 jobs:
 
