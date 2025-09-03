@@ -19,6 +19,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           show-progress: 'false'
+          lfs: 'true'
 
       - name: Generate version number
         id: tag_version
@@ -70,8 +71,16 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+      - name: Build package
+        run: |
+          docker build -f Packager.Dockerfile . -t packager --build-arg VERSION=$VERSION
+          docker run -v $(pwd)/dist:/app/dist packager
+        env:
+          VERSION: ${{ steps.tag_version.outputs.tag }}
+
       - name: Create github release
         uses: ncipollo/release-action@v1
         with:
           tag: ${{ steps.tag_version.outputs.tag }}
           generateReleaseNotes: true
+          artifacts: "dist/*.whl"
