@@ -2,20 +2,48 @@ name: pull_request
 
 on:
   pull_request:
-    branches:
-      - master
+    branches: [ master ]
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
 
 jobs:
+  local-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
 
-  pull_request:
+    environment:
+      name: dev
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Download refGene (sample dataset for tests)
+      run: ./download_refGene.sh -hg38_sample
+
+    - name: Set up Python
+      uses: actions/setup-python@v6
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install Dependencies
+      run: pip install -r requirements.txt && pip install -r requirements-dev.txt
+
+    - name: Run tests
+      run: pytest -v
+
+  docker-tests:
+    needs: local-tests
     runs-on: ubuntu-latest
 
     environment:
       name: dev
 
     steps:
-    - uses: actions/checkout@v3
-    
+    - uses: actions/checkout@v5
+
     - name: Download refGene (sample dataset for tests)
       run: ./download_refGene.sh -hg38_sample
 
