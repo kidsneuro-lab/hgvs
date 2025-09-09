@@ -7,10 +7,11 @@ import traceback
 from pyfaidx import Fasta
 
 import pyhgvs as hgvs
+from pyhgvs.api import get_transcript, get_transcript_X_over_Y
 import pyhgvs.utils as hgvs_utils
 from pyhgvs.models.hgvs_name import InvalidHGVSName
 
-def process_entries(input_file: str, output_file: str, genome_file: str, transcripts_file: str, lazy: bool = False, normalize: bool = True):
+def process_entries(input_file: str, output_file: str, genome_file: str, transcripts_file: str, lazy: bool = False, normalize: bool = True, prioritise_X_over_Y: bool = True):
     if not os.path.exists(genome_file):
         raise FileNotFoundError(f"Genome file '{genome_file}' not found.")
     
@@ -29,14 +30,16 @@ def process_entries(input_file: str, output_file: str, genome_file: str, transcr
         outfile.write(f"#lazy={lazy}\n")
         outfile.write(f"#normalize={normalize}\n")
         outfile.write("ID\tchr\tpos\tref\talt\terror\n")
- 
+
+        get_transcript_fun = get_transcript_X_over_Y if prioritise_X_over_Y else get_transcript
+
         for line in infile:
             line = line.strip()
             try:
                 hgvs_name = line
                 logging.debug(f"Processing variant: {hgvs_name}")
 
-                chr, pos, ref, alt = hgvs.parse_hgvs_name(hgvs_name=hgvs_name, genome=genome, get_transcript=lambda name: transcripts.get(name), lazy=lazy)
+                chr, pos, ref, alt = hgvs.parse_hgvs_name(hgvs_name=hgvs_name, genome=genome, get_transcript=get_transcript_fun, lazy=lazy)
                 outfile.write(f"{hgvs_name}\t{chr}\t{pos}\t{ref}\t{alt}\t\n")
             except InvalidHGVSName:
                 logging.error(f"Invalid HGVS notation '{hgvs_name}")
