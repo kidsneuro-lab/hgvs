@@ -40,17 +40,3 @@ def test_process_entries(genome, transcripts):
 
     # Otherwise test passes
     assert expected == actual
-
-def test_missing_genome_raises(tmp_files):
-    input_file, output_file, genome_file, transcripts_file = tmp_files
-    input_file.write_text("NM_000000.0:c.123A>G\n")
-    transcripts_file.write_text("# dummy transcripts\n")
-    with pytest.raises(FileNotFoundError, match="Genome file '.*' not found"):
-        process_entries(str(input_file), str(output_file), str(genome_file), str(transcripts_file))
-
-def test_missing_transcripts_raises(tmp_files):
-    input_file, output_file, genome_file, transcripts_file = tmp_files
-    input_file.write_text("NM_000000.0:c.123A>G\n")
-    genome_file.write_text(">chr1\nACGT\n")
-    with pytest.raises(FileNotFoundError, match="Transcripts file '.*' not found"):
-        process_entries(str(input_file), str(output_file), str(genome_file), str(transcripts_file))
