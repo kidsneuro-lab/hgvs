@@ -18,6 +18,11 @@ docker compose -f docker-compose-unit-tests.yml up \
   --exit-code-from tests
 
 echo "##########################################"
+echo "Building API tests"
+echo "##########################################"
+docker compose -f docker-compose-api-tests.yml build
+
+echo "##########################################"
 echo "Running API tests"
 echo "##########################################"
 docker compose -f docker-compose-api-tests.yml up \
@@ -26,7 +31,6 @@ docker compose -f docker-compose-api-tests.yml up \
   --no-log-prefix \
   --abort-on-container-exit \
   --exit-code-from hgvs
-
 
 echo "##########################################"
 echo "Calling API"
