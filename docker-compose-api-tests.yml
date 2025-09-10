@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  tests:
+    image: hgvs
+    build: 
+      context: .
+      target: tests
+    environment:
+      - FASTA=tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa
+      - REFGENE=tests/fixtures/genes.refGene

@@ -20,7 +20,7 @@ docker compose -f docker-compose-unit-tests.yml up \
 echo "##########################################"
 echo "Running API tests"
 echo "##########################################"
-docker compose -f docker-compose.yml up \
+docker compose -f docker-compose-api-tests.yml up \
   --force-recreate \
   --remove-orphans \
   --no-log-prefix \
