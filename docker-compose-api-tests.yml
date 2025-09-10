@@ -1,11 +1,11 @@
 version: '3.8'
 
 services:
-  tests:
+  hgvs:
     image: hgvs
-    build: 
-      context: .
-      target: tests
+    build: .
+    ports:
+      - "8002:8002"
     environment:
       - FASTA=tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa
       - REFGENE=tests/fixtures/genes.refGene
