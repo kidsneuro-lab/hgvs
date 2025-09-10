@@ -34,6 +34,45 @@ jobs:
     - name: Run tests
       run: pytest -v
 
+  cli-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+
+    environment:
+      name: dev
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Download refGene (sample dataset for tests)
+      run: ./download_refGene.sh -hg38_sample
+
+    - name: Build package
+      run: |
+        docker build -f Packager.Dockerfile . -t packager --build-arg VERSION=0.0.0
+        docker run -v $(pwd)/dist:/app/dist packager
+      env:
+        VERSION: ${{ steps.tag_version.outputs.tag }}
+
+    - name: Install package
+      run: pip install dist/*.whl
+
+    - name: Run HGVS CLI
+      run: |
+        set -e
+        echo "🏃‍♂️ Running HGVS CLI"
+        hgvs \
+          -i tests/fixtures/cli/input1.txt \
+          -o /tmp/output.txt \
+          -g tests/fixtures/Homo_sapiens.GRCh38.dna.chromosome.X.Y.fa \
+          -t tests/fixtures/genes.refGene \
+          --prioritise_X_over_Y
+
+        echo "🔎 Comparing output files"
+        diff /tmp/output.txt tests/fixtures/cli/output1_expected.txt
+
   docker-tests:
     runs-on: ubuntu-latest
 

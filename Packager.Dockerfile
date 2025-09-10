@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 ARG VERSION=0.1.0
 
 # Argument for version number
