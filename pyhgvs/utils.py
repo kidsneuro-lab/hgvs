@@ -6,6 +6,9 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 
 import operator
+import os
+
+from pathlib import Path
 from .models.variants import Position
 from .models.transcript import Transcript, CDNA_Match, Exon
 
@@ -167,3 +170,68 @@ def read_transcripts(refgene_file):
             transcripts[trans.full_name][trans.tx_position.chrom] = trans        
 
     return transcripts
+
+class TranscriptProvider:
+    def __init__(self, refgene_file: str | None = None, env_var: str = "REFGENE"):
+        """
+        Initialize TranscriptProvider.
+
+        Args:
+            refgene_file (str | None): Path to the file. If None, will try environment variable.
+            env_var (str): Name of the environment variable to check if refgene_file is not given.
+        """
+        # Try direct path first
+        if refgene_file is not None:
+            self._refgene_file = refgene_file
+        else:
+            # Fallback to environment variable
+            env_path = os.getenv(env_var)
+            if env_path is None:
+                raise ValueError(f"No file path provided and environment variable '{env_var}' is not set.")
+            self._refgene_file = env_path
+
+        # Check file existence
+        if not Path(self._refgene_file).exists():
+            raise FileNotFoundError(f"File not found: {self._refgene_file}")
+
+        # Load the file
+        self._transcripts = self._load_file()
+
+    def _load_file(self):
+        """Load the file contents. Customize depending on file type."""
+        with open(self._refgene_file) as infile:
+            return read_transcripts(infile)
+
+    # Provide a callback for fetching a transcript by its name.
+    def _get_transcript(self, name):
+        tx = self._transcripts.get(name)
+
+        if tx is not None:
+            if len(tx) != 1:
+                raise RuntimeError(f"Multiple loci: {', '.join(list(tx.keys()))} found for transcript: {name}")
+            
+            return tx[next(iter(tx))]
+        else:
+            return None
+
+    # Provide a callback for fetching a transcript by its name.
+    def _get_transcript_X_over_Y(self, name):
+        tx = self._transcripts.get(name)
+
+        if tx is not None:
+            # Check if both keys 'X' and 'Y' are in the dictionary
+            if 'X' in tx and 'Y' in tx:
+                return tx['X']
+
+            if len(tx) != 1:
+                raise RuntimeError(f"Multiple loci: {', '.join(list(tx.keys()))} found for transcript: {name}")
+            
+            return tx[next(iter(tx))]
+        else:
+            return None
+
+    def get_transcripts_fn(self, prioritise_X_over_Y: bool = False):
+        if prioritise_X_over_Y:
+            return self._get_transcript_X_over_Y
+        else:
+            return self._get_transcript
