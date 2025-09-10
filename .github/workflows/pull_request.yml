@@ -46,6 +46,9 @@ jobs:
     steps:
     - uses: actions/checkout@v5
 
+    - name: Download refGene (sample dataset for tests)
+      run: ./download_refGene.sh -hg38_sample
+
     - name: Build package
       run: |
         docker build -f Packager.Dockerfile . -t packager --build-arg VERSION=0.0.0
