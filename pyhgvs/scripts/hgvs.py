@@ -54,7 +54,7 @@ def main():
     parser.add_argument("-t", "--transcripts", help="Transcripts information.", required=True)
     parser.add_argument("-l", "--lazy", help="Ignore transcript versioning.", action="store_true")
     parser.add_argument("-n", "--normalize", help="Normalise allele according to VCF standard.", action="store_true")
-    parser.add_argument("-p", "--prioritise_X_over_Y", help="Prioritise X instead of Y for paralogous genes.", action="store_true", default=True)
+    parser.add_argument("-p", "--prioritise_X_over_Y", help="Prioritise X instead of Y for paralogous genes.", action="store", default=True)
     parser.add_argument("-v", "--verbose", help="Enable verbose logging.", action="store_true")
     
     args = parser.parse_args()
