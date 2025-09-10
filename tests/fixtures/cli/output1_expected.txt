@@ -1,4 +1,5 @@
 #lazy=False
 #normalize=True
+#prioritise_X_over_Y=True
 ID	chr	pos	ref	alt	error
 NM_004006.3:c.133C>T	X	32849781	G	A	

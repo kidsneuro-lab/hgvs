@@ -33,19 +33,6 @@ if not os.path.exists(file):
 
 genome = Fasta(file)
 
-# Read RefSeq transcripts into a python dict.
-
-refgene=os.getenv('REFGENE')
-if refgene is None:
-    raise Exception(f"REFGENE env var not set.")
-
-logger.info('Loading REFGENE: %s',refgene)
-if not os.path.exists(refgene):
-    raise Exception(f"REFGENE file: {refgene} not found. Please check if file exists")
-
-with open(refgene) as infile:
-    transcripts = hgvs_utils.read_transcripts(infile)
-
 class VCFVariant(BaseModel):
     input: str
     chr: str | None
@@ -74,34 +61,6 @@ class HgvsMultipleVariantRequest(BaseModel):
 class HgvsMultipleVariantResponse(BaseModel):
     response: list[VCFVariant]
 
-# Provide a callback for fetching a transcript by its name.
-def get_transcript(name):
-    tx = transcripts.get(name)
-
-    if tx is not None:
-        if len(tx) != 1:
-            raise RuntimeError(f"Multiple loci: {', '.join(list(tx.keys()))} found for transcript: {name}")
-        
-        return tx[next(iter(tx))]
-    else:
-        return None
-
-# Provide a callback for fetching a transcript by its name.
-def get_transcript_X_over_Y(name):
-    tx = transcripts.get(name)
-
-    if tx is not None:
-        # Check if both keys 'X' and 'Y' are in the dictionary
-        if 'X' in tx and 'Y' in tx:
-            return tx['X']
-
-        if len(tx) != 1:
-            raise RuntimeError(f"Multiple loci: {', '.join(list(tx.keys()))} found for transcript: {name}")
-        
-        return tx[next(iter(tx))]
-    else:
-        return None
-
 @app.get("/")
 def get_root():
     return {"App": "HGVS Translator"}
@@ -126,10 +85,13 @@ async def unicorn_exception_handler(request: Request, exc: DefaultException):
         content={'error': exc.detail},
     )
 
+transcript_provider = hgvs_utils.TranscriptProvider(refgene_file=None, env_var="REFGENE")
+
 @app.post("/translate", response_model=HgvsSingleVariantResponse)
 async def translate_hgvs(request: HgvsSingleVariantRequest):
     logger.info('Translating %s', request.input)
-    get_transcript_fun = get_transcript_X_over_Y if request.prioritise_X_over_Y else get_transcript
+    
+    get_transcript_fun = transcript_provider.get_transcripts_fn(prioritise_X_over_Y=request.prioritise_X_over_Y)
     try:
         chrom, offset, ref, alt = hgvs.parse_hgvs_name(hgvs_name=request.input, 
                                                        genome=genome, 
