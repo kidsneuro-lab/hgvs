@@ -25,7 +25,7 @@ def test_process_entries(genome, transcripts):
         output_file = tmp.name
 
     # Run the function under test
-    process_entries(input_file, output_file, genome, transcripts)
+    process_entries(input_file, output_file, genome, transcripts, normalize=False)
 
     # Read both expected and actual output
     expected = output_expected_file.read_text().splitlines(keepends=True)

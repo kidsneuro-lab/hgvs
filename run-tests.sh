@@ -26,11 +26,15 @@ echo "##########################################"
 echo "Running API tests"
 echo "##########################################"
 docker compose -f docker-compose-api-tests.yml up \
+  --detach \
   --force-recreate \
   --remove-orphans \
   --no-log-prefix \
   --abort-on-container-exit \
   --exit-code-from hgvs
+
+# Wait for 5 seconds
+sleep 5s
 
 echo "##########################################"
 echo "Calling API"
