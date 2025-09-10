@@ -30,7 +30,6 @@ docker compose -f docker-compose-api-tests.yml up \
   --force-recreate \
   --remove-orphans \
   --no-log-prefix \
-  --abort-on-container-exit \
   --exit-code-from hgvs
 
 # Wait for 5 seconds
