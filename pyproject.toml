@@ -138,7 +138,7 @@ dependencies = [ # Optional
 # projects.
 [project.optional-dependencies] # Optional
 dev = []
-test = ["httpx==0.25.0",
+test = ["httpx==0.28.1",
         "pytest==8.4.2",
         "pytest-dotenv==0.5.2",
         "pytest-github-actions-annotate-failures==0.2.0",
