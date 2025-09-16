@@ -78,7 +78,7 @@ OFFSET_PREFIX = '-' | '+'
 OFFSET = NUMBER
 
 # Primatives:
-NUMBER = \d+
+NUMBER = r"\d+"
 BASE = [ACGT]
 BASES = BASE+
 
@@ -99,8 +99,8 @@ class HGVSRegex(object):
 
     # DNA syntax
     # http://www.hgvs.org/mutnomen/standards.html#nucleotide
-    BASE = "[acgtbdhkmnrsvwyACGTBDHKMNRSVWY]|\d+"
-    BASES = "[acgtbdhkmnrsvwyACGTBDHKMNRSVWY]+|\d+"
+    BASE = r"[acgtbdhkmnrsvwyACGTBDHKMNRSVWY]|\d+"
+    BASES = r"[acgtbdhkmnrsvwyACGTBDHKMNRSVWY]+|\d+"
     DNA_REF = "(?P<ref>" + BASES + ")"
     DNA_ALT = "(?P<alt>" + BASES + ")"
 
@@ -112,17 +112,17 @@ class HGVSRegex(object):
     DUP = "(?P<mutation_type>dup)"
 
     # Simple coordinate syntax
-    COORD_START = "(?P<start>\d+)"
-    COORD_END = "(?P<end>\d+)"
+    COORD_START = r"(?P<start>\d+)"
+    COORD_END = r"(?P<end>\d+)"
     COORD_RANGE = COORD_START + "_" + COORD_END
 
     # cDNA coordinate syntax
-    CDNA_COORD = ("(?P<coord_prefix>|-|\*)(?P<coord>\d+)"
-                  "((?P<offset_prefix>-|\+)(?P<offset>\d+))?")
-    CDNA_START = ("(?P<start>(?P<start_coord_prefix>|-|\*)(?P<start_coord>\d+)"
-                  "((?P<start_offset_prefix>-|\+)(?P<start_offset>\d+))?)")
+    CDNA_COORD = (r"(?P<coord_prefix>|-|\*)(?P<coord>\d+)"
+                  r"((?P<offset_prefix>-|\+)(?P<offset>\d+))?")
+    CDNA_START = (r"(?P<start>(?P<start_coord_prefix>|-|\*)(?P<start_coord>\d+)"
+                  r"((?P<start_offset_prefix>-|\+)(?P<start_offset>\d+))?)")
     CDNA_END = (r"(?P<end>(?P<end_coord_prefix>|-|\*)(?P<end_coord>\d+)"
-                "((?P<end_offset_prefix>-|\+)(?P<end_offset>\d+))?)")
+                r"((?P<end_offset_prefix>-|\+)(?P<end_offset>\d+))?)")
     CDNA_RANGE = CDNA_START + "_" + CDNA_END
 
     # cDNA allele syntax
@@ -164,7 +164,7 @@ class HGVSRegex(object):
     PEP_REF2 = "(?P<ref2>" + PEP + ")"
     PEP_ALT = "(?P<alt>" + PEP + ")"
 
-    PEP_EXTRA = "(?P<extra>(|=|\?)(|fs))"
+    PEP_EXTRA = r"(?P<extra>(|=|\?)(|fs))"
 
     # Peptide allele syntax
     PEP_ALLELE = [
