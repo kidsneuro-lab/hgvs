@@ -99,14 +99,14 @@ classifiers = [  # Optional
 # https://packaging.python.org/discussions/install-requires-vs-requirements/
 dependencies = [ # Optional
     "annotated-types==0.7.0",
-    "anyio==4.10.0",
-    "click==8.2.1",
-    "fastapi==0.116.1",
+    "anyio==4.11.0",
+    "click==8.3.0",
+    "fastapi==0.119.0",
     "flake8==7.3.0",
-    "gitdb==4.0.11",
+    "gitdb==4.0.12",
     "GitPython==3.1.45",
     "h11==0.16.0",
-    "idna==3.10",
+    "idna==3.11",
     "importlib_metadata==8.7.0",
     "lazy==1.6",
     "logging-config==1.0.4",
@@ -114,17 +114,17 @@ dependencies = [ # Optional
     "nose==1.3.7",
     "packaging==25.0",
     "pycodestyle==2.14.0",
-    "pydantic==2.11.7",
-    "pydantic_core==2.33.2",
+    "pydantic==2.12.1",
+    "pydantic_core==2.41.3",
     "pyfaidx==0.9.0.3",
     "pyflakes==3.4.0",
     "setuptools==80.9.0",
     "smmap==5.0.2",
     "sniffio==1.3.1",
-    "starlette==0.47.3",
-    "typing-inspection==0.4.1",
+    "starlette==0.48.0",
+    "typing-inspection==0.4.2",
     "typing_extensions==4.15.0",
-    "uvicorn==0.35.0",
+    "uvicorn==0.37.0",
     "zipp==3.23.0"
 ]
 
@@ -138,7 +138,7 @@ dependencies = [ # Optional
 # projects.
 [project.optional-dependencies] # Optional
 dev = []
-test = ["httpx==0.25.0",
+test = ["httpx==0.28.1",
         "pytest==8.4.2",
         "pytest-dotenv==0.5.2",
         "pytest-github-actions-annotate-failures==0.2.0",
