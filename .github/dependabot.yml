@@ -72,9 +72,6 @@ updates:
     commit-message:
       prefix: "deps"
       include: "scope"
-    groups:
-      devcontainer-all:
-        patterns: ["*"]
 
   # ---- GitHub Actions ----
   - package-ecosystem: "github-actions"
