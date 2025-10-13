@@ -13,7 +13,7 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Australia/Sydney"
-    target-branch: "main"
+    target-branch: "master"
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
     labels: ["dependencies", "python"]
@@ -46,7 +46,7 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Australia/Sydney"
-    target-branch: "main"
+    target-branch: "master"
     open-pull-requests-limit: 3
     rebase-strategy: "auto"
     labels: ["dependencies", "docker"]
@@ -65,7 +65,7 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Australia/Sydney"
-    target-branch: "main"
+    target-branch: "master"
     open-pull-requests-limit: 3
     rebase-strategy: "auto"
     labels: ["dependencies", "devcontainer"]
@@ -84,7 +84,7 @@ updates:
       day: "monday"
       time: "06:00"
       timezone: "Australia/Sydney"
-    target-branch: "main"
+    target-branch: "master"
     open-pull-requests-limit: 3
     rebase-strategy: "auto"
     labels: ["dependencies", "github-actions"]
