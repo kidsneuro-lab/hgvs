@@ -114,8 +114,8 @@ dependencies = [ # Optional
     "nose==1.3.7",
     "packaging==25.0",
     "pycodestyle==2.14.0",
-    "pydantic==2.12.1",
-    "pydantic_core==2.41.3",
+    "pydantic==2.12.3",
+    "pydantic_core==2.41.4",
     "pyfaidx==0.9.0.3",
     "pyflakes==3.4.0",
     "setuptools==80.9.0",
@@ -124,7 +124,7 @@ dependencies = [ # Optional
     "starlette==0.48.0",
     "typing-inspection==0.4.2",
     "typing_extensions==4.15.0",
-    "uvicorn==0.37.0",
+    "uvicorn==0.38.0",
     "zipp==3.23.0"
 ]
 
