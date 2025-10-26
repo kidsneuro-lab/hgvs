@@ -1,25 +1,36 @@
 """
-Helper functions.
+Helper functions for HGVS processing.
 """
-
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import operator
 import os
-
 from pathlib import Path
+from typing import Any, Callable, Dict, Iterator, List, Optional, Tuple, Union
+
 from .models.variants import Position
 from .models.transcript import Transcript, CDNA_Match, Exon
 
 
-def read_refgene(infile):
-    """ refGene = genePred with extra column at front (and ignored ones after) """
+def read_refgene(infile) -> Iterator[Dict[str, Any]]:
+    """
+    Read RefGene format file.
+    
+    RefGene = genePred with extra column at front (and ignored ones after)
+    
+    Args:
+        infile: File handle to read from
+        
+    Yields:
+        Dictionary containing gene/transcript information
+    """
     return read_genepred(infile, skip_first_column=True)
 
 
-def read_genepred(infile, skip_first_column=False):
+def read_genepred(infile, skip_first_column: bool = False) -> Iterator[Dict[str, Any]]:
     """
+    Read GenePred extension format file.
+    
     GenePred extension format:
     http://genome.ucsc.edu/FAQ/FAQformat.html#GenePredExt
 
@@ -36,6 +47,13 @@ def read_genepred(infile, skip_first_column=False):
     9. uint[exonCount] exonEnds;    "Exon end positions"
     10. uint id;                    "Unique identifier"
     11. string name2;               "Alternate name (e.g. gene_id from GTF)"
+    
+    Args:
+        infile: File handle to read from
+        skip_first_column: Whether to skip the first column
+        
+    Yields:
+        Dictionary containing transcript information
     """
     for line in infile:
         # Skip comments.
@@ -172,13 +190,24 @@ def read_transcripts(refgene_file):
     return transcripts
 
 class TranscriptProvider:
-    def __init__(self, refgene_file: str | None = None, env_var: str = "REFGENE"):
+    """
+    Provider for transcript information with improved error handling and validation.
+    
+    This class encapsulates transcript data loading and retrieval,
+    providing a clean interface for accessing transcript information.
+    """
+    
+    def __init__(self, refgene_file: Optional[str] = None, env_var: str = "REFGENE") -> None:
         """
         Initialize TranscriptProvider.
 
         Args:
-            refgene_file (str | None): Path to the file. If None, will try environment variable.
-            env_var (str): Name of the environment variable to check if refgene_file is not given.
+            refgene_file: Path to the file. If None, will try environment variable.
+            env_var: Name of the environment variable to check if refgene_file is not given.
+            
+        Raises:
+            ValueError: If no file path is provided and environment variable is not set
+            FileNotFoundError: If the specified file does not exist
         """
         # Try direct path first
         if refgene_file is not None:
@@ -197,13 +226,41 @@ class TranscriptProvider:
         # Load the file
         self._transcripts = self._load_file()
 
-    def _load_file(self):
-        """Load the file contents. Customize depending on file type."""
-        with open(self._refgene_file) as infile:
-            return read_transcripts(infile)
+    def _load_file(self) -> Dict[str, Dict[str, Transcript]]:
+        """
+        Load the file contents.
+        
+        Returns:
+            Dictionary mapping transcript names to chromosome-specific transcripts
+            
+        Raises:
+            IOError: If file cannot be read
+            ValueError: If file format is invalid
+        """
+        try:
+            with open(self._refgene_file) as infile:
+                return read_transcripts(infile)
+        except IOError as e:
+            raise IOError(f"Failed to read transcript file '{self._refgene_file}': {e}")
+        except Exception as e:
+            raise ValueError(f"Invalid file format in '{self._refgene_file}': {e}")
 
-    # Provide a callback for fetching a transcript by its name.
-    def _get_transcript(self, name):
+    def _get_transcript(self, name: str) -> Optional[Transcript]:
+        """
+        Provide a callback for fetching a transcript by its name.
+        
+        Args:
+            name: Transcript name
+            
+        Returns:
+            Transcript object if found, None otherwise
+            
+        Raises:
+            RuntimeError: If multiple loci are found for the transcript
+        """
+        if not name:
+            return None
+            
         tx = self._transcripts.get(name)
 
         if tx is not None:
@@ -214,8 +271,22 @@ class TranscriptProvider:
         else:
             return None
 
-    # Provide a callback for fetching a transcript by its name.
-    def _get_transcript_X_over_Y(self, name):
+    def _get_transcript_X_over_Y(self, name: str) -> Optional[Transcript]:
+        """
+        Provide a callback for fetching a transcript by its name, prioritizing X over Y.
+        
+        Args:
+            name: Transcript name
+            
+        Returns:
+            Transcript object if found, None otherwise
+            
+        Raises:
+            RuntimeError: If multiple loci are found for the transcript (excluding X/Y case)
+        """
+        if not name:
+            return None
+            
         tx = self._transcripts.get(name)
 
         if tx is not None:
@@ -230,8 +301,35 @@ class TranscriptProvider:
         else:
             return None
 
-    def get_transcripts_fn(self, prioritise_X_over_Y: bool = False):
+    def get_transcripts_fn(self, prioritise_X_over_Y: bool = False) -> Callable[[str], Optional[Transcript]]:
+        """
+        Get a transcript retrieval function with specified behavior.
+        
+        Args:
+            prioritise_X_over_Y: Whether to prioritize X chromosome over Y for paralogous genes
+            
+        Returns:
+            Function that takes a transcript name and returns a Transcript or None
+        """
         if prioritise_X_over_Y:
             return self._get_transcript_X_over_Y
         else:
             return self._get_transcript
+    
+    def get_transcript_count(self) -> int:
+        """
+        Get the total number of transcripts loaded.
+        
+        Returns:
+            Number of transcripts
+        """
+        return len(self._transcripts)
+    
+    def get_available_transcripts(self) -> List[str]:
+        """
+        Get list of available transcript names.
+        
+        Returns:
+            List of transcript names
+        """
+        return list(self._transcripts.keys())

@@ -8,10 +8,10 @@ Definition of which transcript to use coding variants:
 ftp://ftp.ncbi.nih.gov/refseq/H_sapiens/RefSeqGene/LRG_RefSeqGene
 
 """
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import annotations
 
 import re
+from typing import Any, Callable, Optional, Tuple, Union
 
 from .models.cdna import CDNACoord, CDNA_START_CODON, CDNA_STOP_CODON
 from .models.genome import GenomeSubset
@@ -19,11 +19,18 @@ from .models.hgvs_name import HGVSName, InvalidHGVSName
 from .models.variants import justify_indel, normalize_variant, revcomp
 
 
-def get_genomic_sequence(genome, chrom, start, end):
+def get_genomic_sequence(genome: Any, chrom: Union[str, int], start: int, end: int) -> str:
     """
     Return a sequence for the genomic region.
 
-    start, end: 1-based, end-inclusive coordinates of the sequence.
+    Args:
+        genome: Genome sequence object
+        chrom: Chromosome name or number
+        start: 1-based start coordinate (inclusive)
+        end: 1-based end coordinate (inclusive)
+        
+    Returns:
+        Genomic sequence string in uppercase
     """
     if start > end:
         return ''
@@ -31,8 +38,18 @@ def get_genomic_sequence(genome, chrom, start, end):
         return str(genome[str(chrom)][start - 1:end]).upper()
 
 
-def get_allele(hgvs, genome, transcript=None):
-    """Get an allele from a HGVSName, a genome, and a transcript."""
+def get_allele(hgvs: HGVSName, genome: Any, transcript: Optional[Any] = None) -> Tuple[str, int, int, str, str]:
+    """
+    Get an allele from a HGVSName, a genome, and a transcript.
+    
+    Args:
+        hgvs: Parsed HGVS name
+        genome: Genome sequence object
+        transcript: Optional transcript information
+        
+    Returns:
+        Tuple of (chromosome, start, end, reference, alternative)
+    """
     chrom, start, end = hgvs.get_ref_coords(transcript)
     _, alt = hgvs.get_ref_alt(
         transcript.tx_position.is_forward_strand if transcript else True)
@@ -43,8 +60,18 @@ def get_allele(hgvs, genome, transcript=None):
 _indel_mutation_types = set(['ins', 'del', 'dup', 'delins'])
 
 
-def get_vcf_allele(hgvs, genome, transcript=None):
-    """Get an VCF-style allele from a HGVSName, a genome, and a transcript."""
+def get_vcf_allele(hgvs: HGVSName, genome: Any, transcript: Optional[Any] = None) -> Tuple[str, int, int, str, str]:
+    """
+    Get a VCF-style allele from a HGVSName, a genome, and a transcript.
+    
+    Args:
+        hgvs: Parsed HGVS name
+        genome: Genome sequence object  
+        transcript: Optional transcript information
+        
+    Returns:
+        Tuple of (chromosome, start, end, reference, alternative) in VCF format
+    """
     chrom, start, end = hgvs.get_vcf_coords(transcript)
     _, alt = hgvs.get_ref_alt(
         transcript.tx_position.is_forward_strand if transcript else True)
